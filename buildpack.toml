@@ -1,0 +1,8 @@
+
+[buildpack]
+id = "org.cloudfoundry.php-compat"
+name = "PHP Compat Buildpack"
+version = "{{ .Version }}"
+
+[[stacks]]
+id = "org.cloudfoundry.stacks.cflinuxfs3"
