@@ -9,21 +9,21 @@ github.com/buildpack/libbuildpack/build
 github.com/buildpack/libbuildpack/layers
 github.com/buildpack/libbuildpack/detect
 github.com/buildpack/libbuildpack/application
-github.com/buildpack/libbuildpack/buildpack
 github.com/buildpack/libbuildpack/logger
+github.com/buildpack/libbuildpack/buildpack
 github.com/buildpack/libbuildpack/platform
 github.com/buildpack/libbuildpack/services
 github.com/buildpack/libbuildpack/stack
 # github.com/cloudfoundry/libcfbuildpack v1.80.0
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/detect
+github.com/cloudfoundry/libcfbuildpack/helper
+github.com/cloudfoundry/libcfbuildpack/logger
 github.com/cloudfoundry/libcfbuildpack/buildpack
 github.com/cloudfoundry/libcfbuildpack/layers
-github.com/cloudfoundry/libcfbuildpack/logger
 github.com/cloudfoundry/libcfbuildpack/runner
 github.com/cloudfoundry/libcfbuildpack/services
 github.com/cloudfoundry/libcfbuildpack/test
-github.com/cloudfoundry/libcfbuildpack/helper
 github.com/cloudfoundry/libcfbuildpack/internal
 # github.com/fatih/color v1.7.0
 github.com/fatih/color
