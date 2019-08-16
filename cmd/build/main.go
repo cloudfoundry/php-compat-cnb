@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/buildpack/libbuildpack/buildplan"
-
 	"github.com/cloudfoundry/libcfbuildpack/build"
 )
 
@@ -26,5 +24,5 @@ func main() {
 }
 
 func runBuild(context build.Build) (int, error) {
-	return context.Success(buildplan.BuildPlan{}) // TODO implementation
+	return context.Success() // TODO implementation
 }

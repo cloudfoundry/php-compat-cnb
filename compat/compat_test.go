@@ -1,7 +1,7 @@
 package compat
 
 import (
-	"github.com/buildpack/libbuildpack/buildplan"
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	. "github.com/onsi/gomega"
 	"gopkg.in/yaml.v2"
@@ -26,7 +26,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 	it.Before(func() {
 		RegisterTestingT(t)
 		factory = test.NewBuildFactory(t)
-		factory.AddBuildPlan(Layer, buildplan.Dependency{})
+		factory.AddPlan(buildpackplan.Plan{Name: Layer})
 		appRoot = factory.Build.Application.Root
 	})
 

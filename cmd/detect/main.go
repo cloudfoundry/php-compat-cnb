@@ -7,7 +7,6 @@ import (
 
 	"os"
 
-	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/libcfbuildpack/detect"
 )
 
@@ -47,5 +46,5 @@ func runDetect(context detect.Detect) (int, error) {
 		return context.Fail(), nil
 	}
 
-	return context.Pass(buildplan.BuildPlan{})
+	return context.Pass()
 }

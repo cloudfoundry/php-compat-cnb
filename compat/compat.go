@@ -23,7 +23,7 @@ type Contributor struct {
 }
 
 func NewContributor(context build.Build) (Contributor, bool, error) {
-	_, wantDependency := context.BuildPlan[Layer]
+	wantDependency := context.Plans.Has(Layer)
 	if !wantDependency {
 		return Contributor{}, false, nil
 	}
