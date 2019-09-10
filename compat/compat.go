@@ -72,9 +72,17 @@ func (c Contributor) MigrateExtensions(options Options) error {
 		buf.WriteString(fmt.Sprintf("zend_extension=%s.so\n", zendExt))
 	}
 
-	err := helper.WriteFile(filepath.Join(c.appRoot, ".php.ini.d", "compat-extensions.ini"), 0655, buf.String())
+	return helper.WriteFile(filepath.Join(c.appRoot, ".php.ini.d", "compat-extensions.ini"), 0644, buf.String())
+}
 
-	return err
+func (c Contributor) MigrateAdditionalCommands(options Options) error {
+	buf := bytes.Buffer{}
+
+	for _, command := range options.PHP.AdditionalPreprocessCommands{
+		buf.WriteString(fmt.Sprintf("%s\n",command))
+	}
+
+	return helper.WriteFile(filepath.Join(c.appRoot, ".profile.d", "additional-cmds.sh"), 0644, buf.String())
 }
 
 type Options struct {
@@ -93,6 +101,7 @@ type PHPOptions struct {
 	LibDir string `json:"LIBDIR" yaml:"libdirectory"`
 	Extensions []string `json:"PHP_EXTENSIONS" yaml:"-"`
 	ZendExtensions []string `json:"ZEND_EXTENSIONS" yaml:"-"`
+	AdditionalPreprocessCommands []string `json:"ADDITIONAL_PREPROCESS_CMDS" yaml:"-"`
 }
 
 type HTTPDOptions struct {

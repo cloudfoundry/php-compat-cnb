@@ -37,7 +37,8 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 				"HTTPD_VERSION": "2.4.39",
 				"PHP_VERSION": "7.3.10",
 				"NGINX_VERSION": "1.14.3",
-				"COMPOSER_VERSION": "1.9.0"}`
+				"COMPOSER_VERSION": "1.9.0",
+				"ADDITIONAL_PREPROCESS_CMDS": ["some-command", "another-command"]}`
 			err := writeOptionsJSON(appRoot, json)
 			Expect(err).ToNot(HaveOccurred())
 		})
@@ -67,6 +68,22 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 				options, err := LoadOptionsJSON(appRoot)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(options.Composer.Version).To(Equal("1.9.0"))
+			})
+		})
+
+		when("and contains additional commands", func() {
+			it("will copy those to a `.profile.d` script", func() {
+				contributor, _, err := NewContributor(factory.Build)
+				Expect(err).ToNot(HaveOccurred())
+				options, err := LoadOptionsJSON(appRoot)
+				Expect(err).ToNot(HaveOccurred())
+				contributor.MigrateAdditionalCommands(options)
+				pathToAdditionalCMDS := filepath.Join(appRoot, ".profile.d", "additional-cmds.sh")
+
+				Expect(pathToAdditionalCMDS).To(BeARegularFile())
+				additionalCMDS, err := ioutil.ReadFile(pathToAdditionalCMDS)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(additionalCMDS)).To(Equal("some-command\nanother-command\n"))
 			})
 		})
 	})
