@@ -60,12 +60,20 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("deploying the simple_app fixture", func() {
-		it("serves a simple php page with httpd", func() {
-			app, err = PushSimpleApp("simple_app", []string{phpCompatURI}, false)
+		it("serves a simple php page with custom httpd config", func() {
+			app, err = PushSimpleApp("simple_app_httpd", []string{phpCompatURI}, false)
 			Expect(err).To(HaveOccurred())
 
 			// because it fails, the error contains the build logs, not app.BuildLogs()
 			Expect(err.Error()).To(ContainSubstring("Found 1 HTTPD configuration files under `.bp-config/httpd`. Customizing HTTPD configuration in this manner is no longer supported. Please migrate your configuration, see the Migration guide for more details."))
+		})
+
+		it("serves a simple php page with custom nginx config", func() {
+			app, err = PushSimpleApp("simple_app_nginx", []string{phpCompatURI}, false)
+			Expect(err).To(HaveOccurred())
+
+			// because it fails, the error contains the build logs, not app.BuildLogs()
+			Expect(err.Error()).To(ContainSubstring("Found 1 Nginx configuration files under `.bp-config/nginx`. Customizing Nginx configuration in this manner is no longer supported. Please migrate your configuration, see the Migration guide for more details."))
 		})
 	})
 }

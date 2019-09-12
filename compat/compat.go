@@ -46,7 +46,12 @@ func (c Contributor) Contribute() error {
 		c.log.BodyWarning("Specifying a version of 'latest' is no longer supported. The default version of the php-composer-cnb will be used instead.")
 	}
 
-	err = c.ErrorOnCustomHttpdConfig()
+	err = c.ErrorOnCustomServerConfig("HTTPD", "httpd", ".conf")
+	if err != nil {
+		return err
+	}
+
+	err = c.ErrorOnCustomServerConfig("Nginx", "nginx", ".conf")
 	if err != nil {
 		return err
 	}
@@ -92,12 +97,12 @@ func (c Contributor) MigrateAdditionalCommands(options Options) error {
 	return helper.WriteFile(filepath.Join(c.appRoot, ".profile.d", "additional-cmds.sh"), 0644, buf.String())
 }
 
-func (c Contributor) ErrorOnCustomHttpdConfig() error {
-	httpdPath := filepath.Join(c.appRoot, ".bp-config", "httpd")
+func (c Contributor) ErrorOnCustomServerConfig(serverName string, folderName string, extension string) error {
+	serverPath := filepath.Join(c.appRoot, ".bp-config", folderName)
 
 	files := []string{}
-	err := filepath.Walk(httpdPath, func(path string, f os.FileInfo, err error) error {
-		if filepath.Ext(path) == ".conf" {
+	err := filepath.Walk(serverPath, func(path string, f os.FileInfo, err error) error {
+		if filepath.Ext(path) == extension {
 			files = append(files, path)
 		}
 		return nil
@@ -108,7 +113,7 @@ func (c Contributor) ErrorOnCustomHttpdConfig() error {
 	}
 
 	if len(files) > 0 {
-		c.log.BodyError("Found %d HTTPD configuration files under `.bp-config/httpd`. Customizing HTTPD configuration in this manner is no longer supported. Please migrate your configuration, see the Migration guide for more details.", len(files))
+		c.log.BodyError("Found %d %s configuration files under `.bp-config/%s`. Customizing %s configuration in this manner is no longer supported. Please migrate your configuration, see the Migration guide for more details.", len(files), serverName, folderName, serverName)
 		return errors.New("migration failure")
 	}
 
