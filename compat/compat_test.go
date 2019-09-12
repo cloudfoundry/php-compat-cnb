@@ -248,6 +248,24 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
+
+	when(".bp-config/php/php.ini.d exists", func() {
+		it("contains *.ini files", func() {
+			c, _, err := NewContributor(factory.Build)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "php", "php.ini.d", "test.ini"), 0644, "contents")
+			Expect(err).ToNot(HaveOccurred())
+			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "php", "php.ini.d", "another.ini"), 0644, "more contents")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = c.MigratePHPINISnippets()
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(filepath.Join(appRoot, ".php.ini.d", "test.ini")).To(BeARegularFile())
+			Expect(filepath.Join(appRoot, ".php.ini.d", "another.ini")).To(BeARegularFile())
+		})
+	})
 }
 
 func writeOptionsJSON(appRoot, jsonBody string) error {

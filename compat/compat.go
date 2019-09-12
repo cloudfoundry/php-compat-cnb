@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/cloudfoundry/libcfbuildpack/build"
@@ -56,6 +57,12 @@ func (c Contributor) Contribute() error {
 		return err
 	}
 
+	// migrate php.ini snippets
+	err = c.MigratePHPINISnippets()
+	if err != nil {
+		return err
+	}
+
 	// migrate COMPOSER_PATH to buildpack.yml
 	options.Composer.Path = os.Getenv("COMPOSER_PATH")
 
@@ -95,6 +102,28 @@ func (c Contributor) MigrateAdditionalCommands(options Options) error {
 	}
 
 	return helper.WriteFile(filepath.Join(c.appRoot, ".profile.d", "additional-cmds.sh"), 0644, buf.String())
+}
+
+func (c Contributor) MigratePHPINISnippets() error {
+	iniFiles, err := helper.FindFiles(filepath.Join(c.appRoot, ".bp-config", "php", "php.ini.d"), regexp.MustCompile(`^.*\.ini$`))
+	if err != nil {
+		return err
+	}
+
+	if len(iniFiles) > 0 {
+		c.log.BodyWarning("Found %d PHP INI snippets under `.bp-config/php/php.ini.d/`. This location has changed. Moving files to `.php.ini.d/`", len(iniFiles))
+	}
+
+	newIniFolder := filepath.Join(c.appRoot, ".php.ini.d")
+	for _, file := range iniFiles {
+		filename := filepath.Base(file)
+		err := helper.CopyFile(file, filepath.Join(newIniFolder, filename))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (c Contributor) ErrorOnCustomServerConfig(serverName string, folderName string, extension string) error {
