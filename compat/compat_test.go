@@ -249,8 +249,8 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 	})
 
-	when(".bp-config/php/php.ini.d exists", func() {
-		it("contains *.ini files", func() {
+	when(".bp-config/php/ exists", func() {
+		it("subfolder php.ini.d contains *.ini files", func() {
 			c, _, err := NewContributor(factory.Build)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -259,11 +259,28 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "php", "php.ini.d", "another.ini"), 0644, "more contents")
 			Expect(err).ToNot(HaveOccurred())
 
-			err = c.MigratePHPINISnippets()
+			err = c.MigratePHPSnippets("PHP INI", "php.ini.d", ".php.ini.d", "ini")
+
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(filepath.Join(appRoot, ".php.ini.d", "test.ini")).To(BeARegularFile())
 			Expect(filepath.Join(appRoot, ".php.ini.d", "another.ini")).To(BeARegularFile())
+		})
+
+		it("subfolder fpm.d contains *.conf files", func() {
+			c, _, err := NewContributor(factory.Build)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "php", "fpm.d", "test.conf"), 0644, "contents")
+			Expect(err).ToNot(HaveOccurred())
+			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "php", "fpm.d", "another.conf"), 0644, "more contents")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = c.MigratePHPSnippets("PHP-FPM", "fpm.d", ".php.fpm.d", "conf")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(filepath.Join(appRoot, ".php.fpm.d", "test.conf")).To(BeARegularFile())
+			Expect(filepath.Join(appRoot, ".php.fpm.d", "another.conf")).To(BeARegularFile())
 		})
 	})
 }

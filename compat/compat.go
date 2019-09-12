@@ -57,8 +57,13 @@ func (c Contributor) Contribute() error {
 		return err
 	}
 
-	// migrate php.ini snippets
-	err = c.MigratePHPINISnippets()
+	// migrate php.ini and php-fpm snippets
+	err = c.MigratePHPSnippets("PHP INI", "php.ini.d", ".php.ini.d", "ini")
+	if err != nil {
+		return err
+	}
+
+	err = c.MigratePHPSnippets("PHP-FPM", "fpm.d", ".php.fpm.d", "conf")
 	if err != nil {
 		return err
 	}
@@ -104,17 +109,17 @@ func (c Contributor) MigrateAdditionalCommands(options Options) error {
 	return helper.WriteFile(filepath.Join(c.appRoot, ".profile.d", "additional-cmds.sh"), 0644, buf.String())
 }
 
-func (c Contributor) MigratePHPINISnippets() error {
-	iniFiles, err := helper.FindFiles(filepath.Join(c.appRoot, ".bp-config", "php", "php.ini.d"), regexp.MustCompile(`^.*\.ini$`))
+func (c Contributor) MigratePHPSnippets(name string, oldSnippetFolder string, newSnippetFolder string, extension string) error {
+	iniFiles, err := helper.FindFiles(filepath.Join(c.appRoot, ".bp-config", "php", oldSnippetFolder), regexp.MustCompile(fmt.Sprintf(`^.*\.%s$`, extension)))
 	if err != nil {
 		return err
 	}
 
 	if len(iniFiles) > 0 {
-		c.log.BodyWarning("Found %d PHP INI snippets under `.bp-config/php/php.ini.d/`. This location has changed. Moving files to `.php.ini.d/`", len(iniFiles))
+		c.log.BodyWarning("Found %d %s snippets under `.bp-config/php/%s/`. This location has changed. Moving files to `%s/`", len(iniFiles), name, oldSnippetFolder, newSnippetFolder)
 	}
 
-	newIniFolder := filepath.Join(c.appRoot, ".php.ini.d")
+	newIniFolder := filepath.Join(c.appRoot, newSnippetFolder)
 	for _, file := range iniFiles {
 		filename := filepath.Base(file)
 		err := helper.CopyFile(file, filepath.Join(newIniFolder, filename))
