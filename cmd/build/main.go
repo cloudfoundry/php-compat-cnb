@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/cloudfoundry/libcfbuildpack/build"
+	"github.com/cloudfoundry/php-compat-cnb/compat"
 )
 
 func main() {
@@ -24,5 +25,19 @@ func main() {
 }
 
 func runBuild(context build.Build) (int, error) {
-	return context.Success() // TODO implementation
+	context.Logger.Title(context.Buildpack)
+
+	phpCompat, willContribute, err := compat.NewContributor(context)
+	if err != nil {
+		return context.Failure(102), err
+	}
+
+	if willContribute {
+		err := phpCompat.Contribute()
+		if err != nil {
+			return context.Failure(103), err
+		}
+	}
+
+	return context.Success()
 }

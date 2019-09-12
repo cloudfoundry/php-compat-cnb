@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"path/filepath"
+
+	"github.com/buildpack/libbuildpack/buildplan"
+	"github.com/cloudfoundry/libcfbuildpack/helper"
+	"github.com/cloudfoundry/php-compat-cnb/compat"
 
 	"os"
 
@@ -46,5 +49,8 @@ func runDetect(context detect.Detect) (int, error) {
 		return context.Fail(), nil
 	}
 
-	return context.Pass()
+	return context.Pass(buildplan.Plan{
+		Provides: []buildplan.Provided{{Name: compat.Layer}},
+		Requires: []buildplan.Required{{Name: compat.Layer}},
+	})
 }

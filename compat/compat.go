@@ -5,21 +5,22 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/cloudfoundry/libcfbuildpack/build"
-	"github.com/cloudfoundry/libcfbuildpack/helper"
-	"github.com/cloudfoundry/libcfbuildpack/logger"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/cloudfoundry/libcfbuildpack/build"
+	"github.com/cloudfoundry/libcfbuildpack/helper"
+	"github.com/cloudfoundry/libcfbuildpack/logger"
+	"gopkg.in/yaml.v2"
 )
 
 const Layer = "php-compat"
 
 type Contributor struct {
 	appRoot string
-	log logger.Logger
+	log     logger.Logger
 }
 
 func NewContributor(context build.Build) (Contributor, bool, error) {
@@ -30,6 +31,7 @@ func NewContributor(context build.Build) (Contributor, bool, error) {
 
 	return Contributor{
 		appRoot: context.Application.Root,
+		log:     context.Logger,
 	}, true, nil
 }
 
@@ -42,6 +44,11 @@ func (c Contributor) Contribute() error {
 	if strings.ToLower(options.Composer.Version) == "latest" {
 		options.Composer.Version = ""
 		c.log.BodyWarning("Specifying a version of 'latest' is no longer supported. The default version of the php-composer-cnb will be used instead.")
+	}
+
+	err = c.ErrorOnCustomHttpdConfig()
+	if err != nil {
+		return err
 	}
 
 	// migrate COMPOSER_PATH to buildpack.yml
@@ -78,29 +85,52 @@ func (c Contributor) MigrateExtensions(options Options) error {
 func (c Contributor) MigrateAdditionalCommands(options Options) error {
 	buf := bytes.Buffer{}
 
-	for _, command := range options.PHP.AdditionalPreprocessCommands{
-		buf.WriteString(fmt.Sprintf("%s\n",command))
+	for _, command := range options.PHP.AdditionalPreprocessCommands {
+		buf.WriteString(fmt.Sprintf("%s\n", command))
 	}
 
 	return helper.WriteFile(filepath.Join(c.appRoot, ".profile.d", "additional-cmds.sh"), 0644, buf.String())
 }
 
+func (c Contributor) ErrorOnCustomHttpdConfig() error {
+	httpdPath := filepath.Join(c.appRoot, ".bp-config", "httpd")
+
+	files := []string{}
+	err := filepath.Walk(httpdPath, func(path string, f os.FileInfo, err error) error {
+		if filepath.Ext(path) == ".conf" {
+			files = append(files, path)
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if len(files) > 0 {
+		c.log.BodyError("Found %d HTTPD configuration files under `.bp-config/httpd`. Customizing HTTPD configuration in this manner is no longer supported. Please migrate your configuration, see the Migration guide for more details.", len(files))
+		return errors.New("migration failure")
+	}
+
+	return nil
+}
+
 type Options struct {
-	HTTPD HTTPDOptions `yaml:"httpd"`
-	PHP PHPOptions `yaml:"php"`
-	Nginx NginxOptions `yaml:"nginx"`
+	HTTPD    HTTPDOptions    `yaml:"httpd"`
+	PHP      PHPOptions      `yaml:"php"`
+	Nginx    NginxOptions    `yaml:"nginx"`
 	Composer ComposerOptions `yaml:"composer"`
 }
 
 type PHPOptions struct {
-	WebServer string `json:"WEB_SERVER" yaml:"webserver"`
-	Version string `json:"PHP_VERSION" yaml:"version"`
-	AdminEmail string `json:"ADMIN_EMAIL" yaml:"serveradmin"`
-	AppStartCommand string `json:"APP_START_CMD" yaml:"script"`
-	WebDir string `json:"WEBDIR" yaml:"webdirectory"`
-	LibDir string `json:"LIBDIR" yaml:"libdirectory"`
-	Extensions []string `json:"PHP_EXTENSIONS" yaml:"-"`
-	ZendExtensions []string `json:"ZEND_EXTENSIONS" yaml:"-"`
+	WebServer                    string   `json:"WEB_SERVER" yaml:"webserver"`
+	Version                      string   `json:"PHP_VERSION" yaml:"version"`
+	AdminEmail                   string   `json:"ADMIN_EMAIL" yaml:"serveradmin"`
+	AppStartCommand              string   `json:"APP_START_CMD" yaml:"script"`
+	WebDir                       string   `json:"WEBDIR" yaml:"webdirectory"`
+	LibDir                       string   `json:"LIBDIR" yaml:"libdirectory"`
+	Extensions                   []string `json:"PHP_EXTENSIONS" yaml:"-"`
+	ZendExtensions               []string `json:"ZEND_EXTENSIONS" yaml:"-"`
 	AdditionalPreprocessCommands []string `json:"ADDITIONAL_PREPROCESS_CMDS" yaml:"-"`
 }
 
@@ -108,13 +138,13 @@ type HTTPDOptions struct {
 	Version string `json:"HTTPD_VERSION" yaml:version`
 }
 
-type NginxOptions struct{
+type NginxOptions struct {
 	Version string `json:"NGINX_VERSION" yaml:"version"`
 }
 
-type ComposerOptions struct{
+type ComposerOptions struct {
 	Version string `json:"COMPOSER_VERSION" yaml:"version"`
-	Path string `yaml:"json_path"`
+	Path    string `yaml:"json_path"`
 }
 
 // LoadOptionsJSON loads the options.json file from disk
@@ -163,7 +193,7 @@ func LoadOptionsJSON(appRoot string) (Options, error) {
 			return Options{}, err
 		}
 	}
-	return Options{ PHP: phpOptions, HTTPD: httpdOptions, Nginx: nginxOptions, Composer: composerOptions}, nil
+	return Options{PHP: phpOptions, HTTPD: httpdOptions, Nginx: nginxOptions, Composer: composerOptions}, nil
 }
 
 func setPhpDefaultVersions(phpOptions *PHPOptions) {

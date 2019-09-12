@@ -1,14 +1,15 @@
 package compat
 
 import (
-	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
-	"github.com/cloudfoundry/libcfbuildpack/helper"
-	. "github.com/onsi/gomega"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
+	"github.com/cloudfoundry/libcfbuildpack/helper"
+	. "github.com/onsi/gomega"
+	"gopkg.in/yaml.v2"
 
 	"github.com/cloudfoundry/libcfbuildpack/test"
 	"github.com/sclevine/spec"
@@ -135,14 +136,14 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 	when("options need to be written", func() {
 		it("produces buildpack.yml", func() {
 			options := Options{
-				HTTPD:    HTTPDOptions{
+				HTTPD: HTTPDOptions{
 					Version: "2.3.49",
 				},
-				PHP:      PHPOptions{
-					Version: "7.3.10",
+				PHP: PHPOptions{
+					Version:   "7.3.10",
 					WebServer: "standalone",
 				},
-				Nginx:    NginxOptions{
+				Nginx: NginxOptions{
 					Version: "1.14.9",
 				},
 				Composer: ComposerOptions{
@@ -156,7 +157,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(exists).To(BeTrue())
 
-			buildpackYMLOutput, err :=ioutil.ReadFile(filepath.Join(appRoot, "buildpack.yml"))
+			buildpackYMLOutput, err := ioutil.ReadFile(filepath.Join(appRoot, "buildpack.yml"))
 			Expect(err).ToNot(HaveOccurred())
 
 			actualOptions := Options{}
@@ -172,7 +173,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			c, _, err := NewContributor(factory.Build)
 			Expect(err).ToNot(HaveOccurred())
 			options := Options{
-				PHP:      PHPOptions{
+				PHP: PHPOptions{
 					Extensions: []string{"ext1", "ext2"},
 				},
 			}
@@ -191,7 +192,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			c, _, err := NewContributor(factory.Build)
 			Expect(err).ToNot(HaveOccurred())
 			options := Options{
-				PHP:      PHPOptions{
+				PHP: PHPOptions{
 					ZendExtensions: []string{"zext1", "zext2"},
 				},
 			}
@@ -199,19 +200,46 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			err = c.MigrateExtensions(options)
 			Expect(err).ToNot(HaveOccurred())
 
-			extensionOutput, err :=ioutil.ReadFile(filepath.Join(appRoot, ".php.ini.d", "compat-extensions.ini"))
+			extensionOutput, err := ioutil.ReadFile(filepath.Join(appRoot, ".php.ini.d", "compat-extensions.ini"))
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(string(extensionOutput)).To(ContainSubstring("zend_extension=zext1.so"))
 			Expect(string(extensionOutput)).To(ContainSubstring("zend_extension=zext2.so"))
 		})
 	})
+
+	when(".bp-config/httpd exists", func() {
+		it("contains *.conf files", func() {
+			c, _, err := NewContributor(factory.Build)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "httpd", "test.conf"), 0644, "contents")
+			Expect(err).ToNot(HaveOccurred())
+			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "httpd", "anoter.conf"), 0644, "more contents")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = c.ErrorOnCustomHttpdConfig()
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal("Please migrate your configuration, see the Migration guide for more details."))
+		})
+
+		it("doesn't contain *.conf files", func() {
+			c, _, err := NewContributor(factory.Build)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "httpd", "test.txt"), 0644, "contents")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = c.ErrorOnCustomHttpdConfig()
+			Expect(err).ToNot(HaveOccurred())
+		})
+	})
 }
 
-func writeOptionsJSON(appRoot, jsonBody string ) error{
+func writeOptionsJSON(appRoot, jsonBody string) error {
 	optionsJson := filepath.Join(appRoot, ".bp-config", "options.json")
 	err := helper.WriteFile(optionsJson, 0655, "%s", jsonBody)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	return nil

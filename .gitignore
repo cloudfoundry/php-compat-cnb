@@ -4,3 +4,4 @@
 *.tgz
 php-compat-cnb_*
 /bin/
+.vscode/
