@@ -208,7 +208,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 	})
 
-	when(".bp-config/httpd exists", func() {
+	when(".bp-config/httpd or `.bp-config/nginx` exists", func() {
 		it("contains *.conf files", func() {
 			c, _, err := NewContributor(factory.Build)
 			Expect(err).ToNot(HaveOccurred())
@@ -218,9 +218,23 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "httpd", "anoter.conf"), 0644, "more contents")
 			Expect(err).ToNot(HaveOccurred())
 
-			err = c.ErrorOnCustomHttpdConfig()
+			err = c.ErrorOnCustomServerConfig("HTTPD", "httpd", ".conf")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("Please migrate your configuration, see the Migration guide for more details."))
+			Expect(err.Error()).To(Equal("migration failure"))
+		})
+
+		it("contains *.conf files", func() {
+			c, _, err := NewContributor(factory.Build)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "nginx", "test.conf"), 0644, "contents")
+			Expect(err).ToNot(HaveOccurred())
+			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "nginx", "anoter.conf"), 0644, "more contents")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = c.ErrorOnCustomServerConfig("Nginx", "nginx", ".conf")
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal("migration failure"))
 		})
 
 		it("doesn't contain *.conf files", func() {
@@ -230,7 +244,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			err = helper.WriteFile(filepath.Join(appRoot, ".bp-config", "httpd", "test.txt"), 0644, "contents")
 			Expect(err).ToNot(HaveOccurred())
 
-			err = c.ErrorOnCustomHttpdConfig()
+			err = c.ErrorOnCustomServerConfig("HTTPD", "httpd", ".conf")
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
