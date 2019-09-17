@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry/libcfbuildpack/build"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/libcfbuildpack/logger"
+	"github.com/cloudfoundry/php-composer-cnb/composer"
 	"gopkg.in/yaml.v2"
 )
 
@@ -45,6 +46,11 @@ func (c Contributor) Contribute() error {
 	if strings.ToLower(options.Composer.Version) == "latest" {
 		options.Composer.Version = ""
 		c.log.BodyWarning("Specifying a version of 'latest' is no longer supported. The default version of the php-composer-cnb will be used instead.")
+	}
+
+	composerLocation, _ :=	composer.FindComposer(c.appRoot, "")
+	if composerLocation != "" {
+		c.log.BodyWarning("The vendor directory is no longer migrated to LIBDIR. You may need to adjust your code to use a relative path to Composer dependencies.")
 	}
 
 	err = c.ErrorOnCustomServerConfig("HTTPD", "httpd", ".conf")
@@ -110,21 +116,29 @@ func (c Contributor) MigrateAdditionalCommands(options Options) error {
 }
 
 func (c Contributor) MigratePHPSnippets(name string, oldSnippetFolder string, newSnippetFolder string, extension string) error {
-	iniFiles, err := helper.FindFiles(filepath.Join(c.appRoot, ".bp-config", "php", oldSnippetFolder), regexp.MustCompile(fmt.Sprintf(`^.*\.%s$`, extension)))
+	oldIniPath := filepath.Join(c.appRoot, ".bp-config", "php", oldSnippetFolder)
+	exists, err := helper.FileExists(oldIniPath)
 	if err != nil {
 		return err
 	}
 
-	if len(iniFiles) > 0 {
-		c.log.BodyWarning("Found %d %s snippets under `.bp-config/php/%s/`. This location has changed. Moving files to `%s/`", len(iniFiles), name, oldSnippetFolder, newSnippetFolder)
-	}
-
-	newIniFolder := filepath.Join(c.appRoot, newSnippetFolder)
-	for _, file := range iniFiles {
-		filename := filepath.Base(file)
-		err := helper.CopyFile(file, filepath.Join(newIniFolder, filename))
+	if exists {
+		iniFiles, err := helper.FindFiles(oldIniPath, regexp.MustCompile(fmt.Sprintf(`^.*\.%s$`, extension)))
 		if err != nil {
 			return err
+		}
+
+		if len(iniFiles) > 0 {
+			c.log.BodyWarning("Found %d %s snippets under `.bp-config/php/%s/`. This location has changed. Moving files to `%s/`", len(iniFiles), name, oldSnippetFolder, newSnippetFolder)
+		}
+
+		newIniFolder := filepath.Join(c.appRoot, newSnippetFolder)
+		for _, file := range iniFiles {
+			filename := filepath.Base(file)
+			err := helper.CopyFile(file, filepath.Join(newIniFolder, filename))
+			if err != nil {
+				return err
+			}
 		}
 	}
 

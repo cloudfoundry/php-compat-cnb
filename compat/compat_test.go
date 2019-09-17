@@ -1,6 +1,9 @@
 package compat
 
 import (
+	"bytes"
+	bplog "github.com/buildpack/libbuildpack/logger"
+	"github.com/cloudfoundry/libcfbuildpack/logger"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -16,11 +19,11 @@ import (
 	"github.com/sclevine/spec/report"
 )
 
-func TestUnitDetect(t *testing.T) {
-	spec.Run(t, "Detect", testDetect, spec.Report(report.Terminal{}))
+func TestUnitCompat(t *testing.T) {
+	spec.Run(t, "Compat", testCompat, spec.Report(report.Terminal{}))
 }
 
-func testDetect(t *testing.T, when spec.G, it spec.S) {
+func testCompat(t *testing.T, when spec.G, it spec.S) {
 	var factory *test.BuildFactory
 	var appRoot string
 
@@ -281,6 +284,27 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 			Expect(filepath.Join(appRoot, ".php.fpm.d", "test.conf")).To(BeARegularFile())
 			Expect(filepath.Join(appRoot, ".php.fpm.d", "another.conf")).To(BeARegularFile())
+		})
+	})
+
+	when("a composer.json file exists", func() {
+		it("logs a warning that we no longer move vendor", func() {
+			buf := bytes.Buffer{}
+			info := logger.Logger{
+				Logger: bplog.NewLogger(&buf, &buf),
+			}
+			factory.Build.Logger = info
+
+			c, _, err := NewContributor(factory.Build)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = helper.WriteFile(filepath.Join(appRoot, "composer.json"), 0644, "contents")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = c.Contribute()
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(buf.String()).To(ContainSubstring("The vendor directory is no longer migrated to LIBDIR."))
 		})
 	})
 }

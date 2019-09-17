@@ -29,6 +29,15 @@ github.com/cloudfoundry/libcfbuildpack/runner
 github.com/cloudfoundry/libcfbuildpack/services
 github.com/cloudfoundry/libcfbuildpack/test
 github.com/cloudfoundry/libcfbuildpack/internal
+# github.com/cloudfoundry/php-composer-cnb v0.0.18
+github.com/cloudfoundry/php-composer-cnb/composer
+github.com/cloudfoundry/php-composer-cnb/runner
+# github.com/cloudfoundry/php-dist-cnb v0.0.29
+github.com/cloudfoundry/php-dist-cnb/php
+# github.com/cloudfoundry/php-web-cnb v0.0.21
+github.com/cloudfoundry/php-web-cnb/config
+github.com/cloudfoundry/php-web-cnb/phpweb
+github.com/cloudfoundry/php-web-cnb/procmgr
 # github.com/fatih/color v1.7.0
 github.com/fatih/color
 # github.com/golang/protobuf v1.3.2
