@@ -50,7 +50,11 @@ func (c Contributor) Contribute() error {
 
 	composerLocation, _ :=	composer.FindComposer(c.appRoot, "")
 	if composerLocation != "" {
-		c.log.BodyWarning("The vendor directory is no longer migrated to LIBDIR. You may need to adjust your code to use a relative path to Composer dependencies.")
+		c.log.BodyWarning("Attention: some lesser used Composer configuration options have been removed.")
+		c.log.BodyWarning("- The vendor directory is no longer migrated to LIBDIR. You may need to adjust your code to use a relative path to Composer dependencies.")
+		c.log.BodyWarning("- The composer.json and composer.lock files are no longer moved to the root of your application. This is the behavior most people expect. If you need them in a specific location, put them there prior to pushing your code.")
+		c.log.BodyWarning("- COMPOSER_BIN_DIR is no longer supported. Please create a Github issue if you have a use case which requires this option.")
+		c.log.BodyWarning("- COMPOSER_CACHE_DIR is no longer supported. Please create a Github issue if you have a use case which requires this option.")
 	}
 
 	err = c.ErrorOnCustomServerConfig("HTTPD", "httpd", ".conf")
