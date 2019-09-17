@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -81,8 +82,14 @@ func (c Contributor) Contribute() error {
 	// migrate COMPOSER_PATH to buildpack.yml
 	options.Composer.Path = os.Getenv("COMPOSER_PATH")
 
-	//migrate PHP/ZEND_EXTENSIONS
+	// migrate PHP/ZEND_EXTENSIONS
 	err = c.MigrateExtensions(options)
+	if err != nil {
+		return err
+	}
+
+	// move files if there is no WEBDIR
+	err = c.MoveWebFilesToWebDir(options)
 	if err != nil {
 		return err
 	}
@@ -172,6 +179,74 @@ func (c Contributor) ErrorOnCustomServerConfig(serverName string, folderName str
 	return nil
 }
 
+func (c Contributor) IsWebApp(options Options) (bool, error) {
+	// TODO: define how to determine if this is a web app
+	//   - can't use the build plan as php-web-cnb's detect won't pass
+	//   - can't look at files because there's no way to tell
+	//   - thinking we can look at app start command, make sure it's empty and then
+	//      check that none of the default script names exist, then it would be a web app
+}
+
+func (c Contributor) MoveWebFilesToWebDir(options Options) error {
+	isWebApp, err := c.IsWebApp(options)
+	if err != nil {
+		return err
+	}
+
+	if isWebApp {
+		webDirPath := filepath.Join(c.appRoot, options.PHP.WebDir)
+		webDirExists, err := helper.FileExists(webDirPath)
+		if err != nil {
+			return err
+		}
+
+		if !webDirExists {
+			c.log.Body("WEBDIR doesn't exist, moving files into WEBDIR...")
+			args := []string {
+				"-vam",
+				"--delete",
+				"--remove-source-files",
+				fmt.Sprintf("--exclude=%s", ".extensions"),
+				fmt.Sprintf("--exclude=%s", ".bp-config"),
+				fmt.Sprintf("--exclude=%s", options.PHP.LibDir),
+				fmt.Sprintf("--exclude=%s", "manifest.yml"),
+				fmt.Sprintf("--exclude=%s", ".profile.d"),
+				fmt.Sprintf("--exclude=%s", ".profile"),
+				fmt.Sprintf("--exclude=%s", options.PHP.WebDir),
+				fmt.Sprintf("%s/", c.appRoot),
+				webDirPath,
+			}
+			cmd := exec.Command("rsync", args...)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			err := cmd.Run()
+			if err != nil {
+				return err
+			}
+
+			// rsync leaves behind empty directories, remove those
+			args = []string {
+				c.appRoot,
+				"-type",
+				"d",
+				"-empty",
+				"-delete",
+			}
+			cmd = exec.Command("find", args...)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			err = cmd.Run()
+			if err != nil {
+				return err
+			}
+			c.log.Body("Moving files done.")
+		}
+
+	}
+
+	return nil
+}
+
 type Options struct {
 	HTTPD    HTTPDOptions    `yaml:"httpd"`
 	PHP      PHPOptions      `yaml:"php"`
@@ -202,6 +277,9 @@ type NginxOptions struct {
 type ComposerOptions struct {
 	Version string `json:"COMPOSER_VERSION" yaml:"version"`
 	Path    string `yaml:"json_path"`
+	GlobalOptions []string `json:"COMPOSER_INSTALL_GLOBAL" yaml:"install_global"`
+	InstallOptions []string `json:"COMPOSER_INSTALL_OPTIONS" yaml:"install_options"`
+	VendorDirectory string `json:"COMPOSER_VENDOR_DIR" yaml:"vendor_directory"`
 }
 
 // LoadOptionsJSON loads the options.json file from disk
