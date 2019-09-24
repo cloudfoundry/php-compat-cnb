@@ -49,8 +49,18 @@ func runDetect(context detect.Detect) (int, error) {
 		return context.Fail(), nil
 	}
 
+	options, err := compat.LoadOptionsJSON(context.Application.Root)
+	if err != nil {
+		return context.Fail(), err
+	}
+	err = compat.ErrorIfShouldHaveMovedWebFilesToWebDir(options, context)
+	if err != nil {
+		return context.Fail(), err
+	}
+
 	return context.Pass(buildplan.Plan{
 		Provides: []buildplan.Provided{{Name: compat.Layer}},
 		Requires: []buildplan.Required{{Name: compat.Layer}},
 	})
 }
+

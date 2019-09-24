@@ -65,7 +65,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 	when(".bp-config exists", func() {
 		it.Before(func() {
-			err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".bp-config", "options.json"), 0x644, "{}")
+			err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".bp-config", "options.json"), 0644, "{}")
 			Expect(err).ToNot(HaveOccurred())
 		})
 
@@ -76,7 +76,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 		when(".extensions is present", func() {
 			it.Before(func() {
-				err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".extensions", "options.json"), 0x644, "{}")
+				err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".extensions", "options.json"), 0644, "{}")
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -102,7 +102,6 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 	})
 
-
 	when("a COMPOSER_PATH is not set and", func(){
 		when(".bp-config does not exist", func() {
 			it("fails detect", func() {
@@ -113,6 +112,4 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			})
 		})
 	})
-
-
 }

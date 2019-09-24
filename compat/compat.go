@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/cloudfoundry/libcfbuildpack/detect"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -84,12 +84,6 @@ func (c Contributor) Contribute() error {
 
 	// migrate PHP/ZEND_EXTENSIONS
 	err = c.MigrateExtensions(options)
-	if err != nil {
-		return err
-	}
-
-	// move files if there is no WEBDIR
-	err = c.MoveWebFilesToWebDir(options)
 	if err != nil {
 		return err
 	}
@@ -174,74 +168,6 @@ func (c Contributor) ErrorOnCustomServerConfig(serverName string, folderName str
 	if len(files) > 0 {
 		c.log.BodyError("Found %d %s configuration files under `.bp-config/%s`. Customizing %s configuration in this manner is no longer supported. Please migrate your configuration, see the Migration guide for more details.", len(files), serverName, folderName, serverName)
 		return errors.New("migration failure")
-	}
-
-	return nil
-}
-
-func (c Contributor) IsWebApp(options Options) (bool, error) {
-	// TODO: define how to determine if this is a web app
-	//   - can't use the build plan as php-web-cnb's detect won't pass
-	//   - can't look at files because there's no way to tell
-	//   - thinking we can look at app start command, make sure it's empty and then
-	//      check that none of the default script names exist, then it would be a web app
-}
-
-func (c Contributor) MoveWebFilesToWebDir(options Options) error {
-	isWebApp, err := c.IsWebApp(options)
-	if err != nil {
-		return err
-	}
-
-	if isWebApp {
-		webDirPath := filepath.Join(c.appRoot, options.PHP.WebDir)
-		webDirExists, err := helper.FileExists(webDirPath)
-		if err != nil {
-			return err
-		}
-
-		if !webDirExists {
-			c.log.Body("WEBDIR doesn't exist, moving files into WEBDIR...")
-			args := []string {
-				"-vam",
-				"--delete",
-				"--remove-source-files",
-				fmt.Sprintf("--exclude=%s", ".extensions"),
-				fmt.Sprintf("--exclude=%s", ".bp-config"),
-				fmt.Sprintf("--exclude=%s", options.PHP.LibDir),
-				fmt.Sprintf("--exclude=%s", "manifest.yml"),
-				fmt.Sprintf("--exclude=%s", ".profile.d"),
-				fmt.Sprintf("--exclude=%s", ".profile"),
-				fmt.Sprintf("--exclude=%s", options.PHP.WebDir),
-				fmt.Sprintf("%s/", c.appRoot),
-				webDirPath,
-			}
-			cmd := exec.Command("rsync", args...)
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			err := cmd.Run()
-			if err != nil {
-				return err
-			}
-
-			// rsync leaves behind empty directories, remove those
-			args = []string {
-				c.appRoot,
-				"-type",
-				"d",
-				"-empty",
-				"-delete",
-			}
-			cmd = exec.Command("find", args...)
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			err = cmd.Run()
-			if err != nil {
-				return err
-			}
-			c.log.Body("Moving files done.")
-		}
-
 	}
 
 	return nil
@@ -363,6 +289,30 @@ func WriteOptionsToBuildpackYAML(appRoot string, options Options) error {
 	err = ioutil.WriteFile(filepath.Join(appRoot, "buildpack.yml"), optionsBytes, 0655)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func ErrorIfShouldHaveMovedWebFilesToWebDir(options Options, context detect.Detect) error {
+	isWebApp, err := helper.FileExists(filepath.Join(context.Application.Root, "index.php"))
+	if err != nil {
+		return err
+	}
+
+	webDir := "htdocs"
+	if options.PHP.WebDir != "" {
+		webDir = options.PHP.WebDir
+	}
+	webDirPath := filepath.Join(context.Application.Root, webDir)
+	webDirExists, err := helper.FileExists(webDirPath)
+	if err != nil {
+		return err
+	}
+
+	if isWebApp && !webDirExists {
+		context.Logger.BodyError("WEBDIR doesn't exist, we no longer move files into WEBDIR. Please create WEBDIR and push your app again.")
+		return errors.New("files no longer moved into WEBDIR")
 	}
 
 	return nil

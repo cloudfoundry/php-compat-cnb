@@ -33,11 +33,11 @@ func PreparePhpBps() error {
 	//if err != nil {
 	//	return err
 	//}
-
-	phpWebURI, err = dagger.GetLatestBuildpack("php-web-cnb")
-	if err != nil {
-		return err
-	}
+	//
+	//phpWebURI, err = dagger.GetLatestBuildpack("php-web-cnb")
+	//if err != nil {
+	//	return err
+	//}
 
 	phpCompatURI, err = dagger.PackageBuildpack(bpRoot)
 	if err != nil {
