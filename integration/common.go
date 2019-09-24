@@ -19,27 +19,25 @@ func PreparePhpBps() error {
 		return err
 	}
 
-	// Commenting out as we don't need these at the moment and it makes the integration tests run faster
+	phpDistURI, err = dagger.GetLatestBuildpack("php-dist-cnb")
+	if err != nil {
+		return err
+	}
+
+	//httpdURI, err = dagger.GetLatestBuildpack("httpd-cnb")
+	//if err != nil {
+	//	return err
+	//}
 	//
-	// phpDistURI, err = dagger.GetLatestBuildpack("php-dist-cnb")
-	// if err != nil {
-	// 	return err
-	// }
-
-	// httpdURI, err = dagger.GetLatestBuildpack("httpd-cnb")
-	// if err != nil {
-	// 	return err
-	// }
-
-	// nginxURI, err = dagger.GetLatestBuildpack("nginx-cnb")
-	// if err != nil {
-	// 	return err
-	// }
-
-	// phpWebURI, err = dagger.GetLatestBuildpack("php-web-cnb")
-	// if err != nil {
-	// 	return err
-	// }
+	//nginxURI, err = dagger.GetLatestBuildpack("nginx-cnb")
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//phpWebURI, err = dagger.GetLatestBuildpack("php-web-cnb")
+	//if err != nil {
+	//	return err
+	//}
 
 	phpCompatURI, err = dagger.PackageBuildpack(bpRoot)
 	if err != nil {
