@@ -27,16 +27,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var (
-	app *dagger.App
-	err error
-)
-
 func TestIntegration(t *testing.T) {
 	RegisterTestingT(t)
 
-	var err error
-	err = PreparePhpBps()
+	err := PreparePhpBps()
 	Expect(err).ToNot(HaveOccurred())
 	spec.Run(t, "Integration", testIntegration, spec.Report(report.Terminal{}))
 	CleanUpBps()
@@ -44,14 +38,9 @@ func TestIntegration(t *testing.T) {
 
 func testIntegration(t *testing.T, when spec.G, it spec.S) {
 	var (
-		Expect func(interface{}, ...interface{}) Assertion
 		app    *dagger.App
 		err    error
 	)
-
-	it.Before(func() {
-		Expect = NewWithT(t).Expect
-	})
 
 	it.After(func() {
 		if app != nil {
@@ -61,7 +50,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 
 	when("deploying the simple_app fixture", func() {
 		it("serves a simple php page with custom httpd config", func() {
-			app, err = PushSimpleApp("simple_app_httpd", []string{phpCompatURI}, false)
+			app, err = PushSimpleApp("simple_app_httpd", []string{httpdURI, phpCompatURI}, false)
 			Expect(err).To(HaveOccurred())
 
 			// because it fails, the error contains the build logs, not app.BuildLogs()
@@ -69,7 +58,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("serves a simple php page with custom nginx config", func() {
-			app, err = PushSimpleApp("simple_app_nginx", []string{phpCompatURI}, false)
+			app, err = PushSimpleApp("simple_app_nginx", []string{httpdURI, phpCompatURI}, false)
 			Expect(err).To(HaveOccurred())
 
 			// because it fails, the error contains the build logs, not app.BuildLogs()
@@ -77,11 +66,26 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("serves a simple php page which requires files to be moved into WEBDIR", func() {
-			app, err = PushSimpleApp("simple_app_moves_files", []string{phpCompatURI}, false)
+			app, err = PushSimpleApp("simple_app_moves_files", []string{httpdURI, phpCompatURI}, false)
 			Expect(err).To(HaveOccurred())
 
 			// because it fails, the error contains the build logs, not app.BuildLogs()
 			Expect(err.Error()).To(ContainSubstring("WEBDIR doesn't exist, we no longer move files into WEBDIR. Please create WEBDIR and push your app again."))
+		})
+
+		it("serves a cake php app with remote dependencies", func() {
+			app, err = PushSimpleApp("cake_remote_deps", []string{httpdURI, phpCompatURI, phpDistURI, composerURI, phpWebURI}, false)
+			Expect(err).ToNot(HaveOccurred())
+
+			body, _, err := app.HTTPGet("/")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(body).To(ContainSubstring("Your version of PHP is 5.6.0 or higher"))
+			Expect(body).To(ContainSubstring("Your version of PHP has the mbstring extension loaded"))
+			Expect(body).To(ContainSubstring("Your version of PHP has the openssl extension loaded"))
+			Expect(body).To(ContainSubstring("Your version of PHP has the intl extension loaded"))
+			Expect(body).To(ContainSubstring("Your tmp directory is writable"))
+			Expect(body).To(ContainSubstring("Your logs directory is writable"))
+			Expect(body).To(ContainSubstring("CakePHP is able to connect to the database"))
 		})
 	})
 }

@@ -7,8 +7,8 @@ github.com/buildpack/libbuildpack/buildplan
 github.com/buildpack/libbuildpack/build
 github.com/buildpack/libbuildpack/layers
 github.com/buildpack/libbuildpack/internal
-github.com/buildpack/libbuildpack/detect
 github.com/buildpack/libbuildpack/application
+github.com/buildpack/libbuildpack/detect
 github.com/buildpack/libbuildpack/logger
 github.com/buildpack/libbuildpack/buildpack
 github.com/buildpack/libbuildpack/buildpackplan
@@ -17,6 +17,8 @@ github.com/buildpack/libbuildpack/services
 github.com/buildpack/libbuildpack/stack
 # github.com/cloudfoundry/dagger v0.0.0-20191001184736-b0f1e98b53b2
 github.com/cloudfoundry/dagger
+# github.com/cloudfoundry/httpd-cnb v0.0.19
+github.com/cloudfoundry/httpd-cnb/httpd
 # github.com/cloudfoundry/libcfbuildpack v1.88.1
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/detect
@@ -29,6 +31,8 @@ github.com/cloudfoundry/libcfbuildpack/runner
 github.com/cloudfoundry/libcfbuildpack/services
 github.com/cloudfoundry/libcfbuildpack/test
 github.com/cloudfoundry/libcfbuildpack/internal
+# github.com/cloudfoundry/nginx-cnb v0.0.33
+github.com/cloudfoundry/nginx-cnb/nginx
 # github.com/cloudfoundry/php-composer-cnb v0.0.18
 github.com/cloudfoundry/php-composer-cnb/composer
 github.com/cloudfoundry/php-composer-cnb/runner

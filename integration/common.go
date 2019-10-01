@@ -1,15 +1,13 @@
 package integration
 
 import (
-	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/cloudfoundry/dagger"
 )
 
 var (
-	phpCompatURI, phpDistURI, httpdURI, nginxURI, phpWebURI string
+	phpCompatURI, phpDistURI, composerURI, httpdURI, nginxURI, phpWebURI string
 )
 
 // PreparePhpBps builds the current buildpacks
@@ -24,20 +22,25 @@ func PreparePhpBps() error {
 		return err
 	}
 
-	//httpdURI, err = dagger.GetLatestBuildpack("httpd-cnb")
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//nginxURI, err = dagger.GetLatestBuildpack("nginx-cnb")
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//phpWebURI, err = dagger.GetLatestBuildpack("php-web-cnb")
-	//if err != nil {
-	//	return err
-	//}
+	composerURI, err = dagger.GetLatestBuildpack("php-composer-cnb")
+	if err != nil {
+		return err
+	}
+
+	httpdURI, err = dagger.GetLatestBuildpack("httpd-cnb")
+	if err != nil {
+		return err
+	}
+
+	nginxURI, err = dagger.GetLatestBuildpack("nginx-cnb")
+	if err != nil {
+		return err
+	}
+
+	phpWebURI, err = dagger.GetLatestBuildpack("php-web-cnb")
+	if err != nil {
+		return err
+	}
 
 	phpCompatURI, err = dagger.PackageBuildpack(bpRoot)
 	if err != nil {
@@ -87,22 +90,7 @@ func PushSimpleApp(name string, buildpacks []string, script bool) (*dagger.App, 
 	}
 
 	err = app.Start()
-
 	if err != nil {
-		_, err = fmt.Fprintf(os.Stderr, "App failed to start: %v\n", err)
-		containerID, imageName, volumeIDs, err := app.Info()
-		if err != nil {
-			return app, err
-		}
-
-		fmt.Printf("ContainerID: %s\nImage Name: %s\nAll leftover cached volumes: %v\n", containerID, imageName, volumeIDs)
-
-		containerLogs, err := app.Logs()
-		if err != nil {
-			return app, err
-		}
-
-		fmt.Printf("Container Logs:\n %s\n", containerLogs)
 		return app, err
 	}
 

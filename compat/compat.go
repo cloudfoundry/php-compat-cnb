@@ -54,8 +54,12 @@ func (c Contributor) Contribute() error {
 		c.log.BodyWarning("Attention: some lesser used Composer configuration options have been removed.")
 		c.log.BodyWarning("- The vendor directory is no longer migrated to LIBDIR. You may need to adjust your code to use a relative path to Composer dependencies.")
 		c.log.BodyWarning("- The composer.json and composer.lock files are no longer moved to the root of your application. This is the behavior most people expect. If you need them in a specific location, put them there prior to pushing your code.")
-		c.log.BodyWarning("- COMPOSER_BIN_DIR is no longer supported. Please create a Github issue if you have a use case which requires this option.")
-		c.log.BodyWarning("- COMPOSER_CACHE_DIR is no longer supported. Please create a Github issue if you have a use case which requires this option.")
+		if options.Composer.BinDirectory != "" {
+			c.log.BodyWarning("- COMPOSER_BIN_DIR is no longer supported. Please create a Github issue if you have a use case which requires this option. Otherwise, remove this setting from options.json.")
+		}
+		if options.Composer.CacheDirectory != "" {
+			c.log.BodyWarning("- COMPOSER_CACHE_DIR is no longer supported. Please create a Github issue if you have a use case which requires this option. Otherwise, remove this setting from options.json.")
+		}
 	}
 
 	err = c.ErrorOnCustomServerConfig("HTTPD", "httpd", ".conf")
@@ -181,31 +185,33 @@ type Options struct {
 }
 
 type PHPOptions struct {
-	WebServer                    string   `json:"WEB_SERVER" yaml:"webserver"`
-	Version                      string   `json:"PHP_VERSION" yaml:"version"`
-	AdminEmail                   string   `json:"ADMIN_EMAIL" yaml:"serveradmin"`
-	AppStartCommand              string   `json:"APP_START_CMD" yaml:"script"`
-	WebDir                       string   `json:"WEBDIR" yaml:"webdirectory"`
-	LibDir                       string   `json:"LIBDIR" yaml:"libdirectory"`
+	WebServer                    string   `json:"WEB_SERVER" yaml:"webserver,omitempty"`
+	Version                      string   `json:"PHP_VERSION" yaml:"version,omitempty"`
+	AdminEmail                   string   `json:"ADMIN_EMAIL" yaml:"serveradmin,omitempty"`
+	AppStartCommand              string   `json:"APP_START_CMD" yaml:"script,omitempty"`
+	WebDir                       string   `json:"WEBDIR" yaml:"webdirectory,omitempty"`
+	LibDir                       string   `json:"LIBDIR" yaml:"libdirectory,omitempty"`
 	Extensions                   []string `json:"PHP_EXTENSIONS" yaml:"-"`
 	ZendExtensions               []string `json:"ZEND_EXTENSIONS" yaml:"-"`
 	AdditionalPreprocessCommands []string `json:"ADDITIONAL_PREPROCESS_CMDS" yaml:"-"`
 }
 
 type HTTPDOptions struct {
-	Version string `json:"HTTPD_VERSION" yaml:version`
+	Version string `json:"HTTPD_VERSION" yaml:"version,omitempty"`
 }
 
 type NginxOptions struct {
-	Version string `json:"NGINX_VERSION" yaml:"version"`
+	Version string `json:"NGINX_VERSION" yaml:"version,omitempty"`
 }
 
 type ComposerOptions struct {
-	Version string `json:"COMPOSER_VERSION" yaml:"version"`
-	Path    string `yaml:"json_path"`
-	GlobalOptions []string `json:"COMPOSER_INSTALL_GLOBAL" yaml:"install_global"`
-	InstallOptions []string `json:"COMPOSER_INSTALL_OPTIONS" yaml:"install_options"`
-	VendorDirectory string `json:"COMPOSER_VENDOR_DIR" yaml:"vendor_directory"`
+	Version string `json:"COMPOSER_VERSION" yaml:"version,omitempty"`
+	Path    string `yaml:"json_path,omitempty"`
+	GlobalOptions []string `json:"COMPOSER_INSTALL_GLOBAL" yaml:"install_global,omitempty"`
+	InstallOptions []string `json:"COMPOSER_INSTALL_OPTIONS" yaml:"install_options,omitempty"`
+	VendorDirectory string `json:"COMPOSER_VENDOR_DIR" yaml:"vendor_directory,omitempty"`
+	BinDirectory string `json:"COMPOSER_BIN_DIR" yaml:"-"`
+	CacheDirectory string `json:"COMPOSER_CACHE_DIR" yaml:"-"`
 }
 
 // LoadOptionsJSON loads the options.json file from disk

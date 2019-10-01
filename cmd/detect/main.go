@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/buildpack/libbuildpack/buildplan"
+	"github.com/cloudfoundry/httpd-cnb/httpd"
+	"github.com/cloudfoundry/nginx-cnb/nginx"
 	"path/filepath"
 
-	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/php-compat-cnb/compat"
 
@@ -58,9 +60,35 @@ func runDetect(context detect.Detect) (int, error) {
 		return context.Fail(), err
 	}
 
-	return context.Pass(buildplan.Plan{
+	plan := buildplan.Plan{
 		Provides: []buildplan.Provided{{Name: compat.Layer}},
 		Requires: []buildplan.Required{{Name: compat.Layer}},
-	})
+	}
+
+	webDirExists, err := helper.FileExists(filepath.Join(context.Application.Root, options.PHP.WebDir))
+	if err != nil {
+		return context.Fail(), err
+	}
+
+	if webDirExists {
+		webServer := httpd.Dependency
+		if options.PHP.WebServer != "" {
+			webServer = options.PHP.WebServer
+		}
+
+		webServerVersion := "*"
+		if webServer == httpd.Dependency {
+			webServerVersion = options.HTTPD.Version
+		} else if webServer == nginx.Dependency {
+			webServerVersion = options.Nginx.Version
+		}
+		plan.Requires = append(plan.Requires, buildplan.Required{
+			Name: webServer,
+			Version: webServerVersion,
+			Metadata: buildplan.Metadata{"launch": true},
+		})
+	}
+
+	return context.Pass(plan)
 }
 
