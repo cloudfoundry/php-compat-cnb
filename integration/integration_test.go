@@ -87,5 +87,36 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			Expect(body).To(ContainSubstring("Your logs directory is writable"))
 			Expect(body).To(ContainSubstring("CakePHP is able to connect to the database"))
 		})
+
+		it("deploying a basic PHP app with custom conf files in php.ini.d dir in app root", func() {
+			app, err = PushSimpleApp("php_with_php_ini_d", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			Expect(err).ToNot(HaveOccurred())
+
+			body, _, err := app.HTTPGet("/")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(body).To(ContainSubstring("lkjoienfOIENFlnflkdnfiwpenLKDNFoi"))
+		})
+
+		it("deploying a basic PHP app with custom conf files in fpm.d dir in app root", func() {
+			app, err = PushSimpleApp("php_with_fpm_d", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			Expect(err).ToNot(HaveOccurred())
+
+			body, _, err := app.HTTPGet("/")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(body).To(ContainSubstring("TEST_WEBDIR == htdocs"))
+			Expect(body).To(ContainSubstring("TEST_HOME_PATH == /workspace/test/path"))
+		})
+
+		it("deploying a basic PHP app that loads all prepackaged extensions", func() {
+			app, err = PushSimpleApp("php_all_modules", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			Expect(err).ToNot(HaveOccurred())
+
+			body, _, err := app.HTTPGet("/")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "sqlsrv"))
+			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "pdo_sqlsrv"))
+			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "maxminddb"))
+			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "ioncube"))
+		})
 	})
 }
