@@ -118,5 +118,14 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "maxminddb"))
 			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "ioncube"))
 		})
+
+		it("deploying a basic PHP Symfony app", func() {
+			app, err = PushSimpleApp("symfony_service", []string{httpdURI, phpCompatURI, phpDistURI, composerURI, phpWebURI}, false)
+			Expect(err).ToNot(HaveOccurred())
+
+			body, _, err := app.HTTPGet("/lucky/number")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(body).To(ContainSubstring("Lucky number: 42"))
+		})
 	})
 }
