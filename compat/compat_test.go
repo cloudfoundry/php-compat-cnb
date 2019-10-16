@@ -161,8 +161,8 @@ func testCompat(t *testing.T, when spec.G, it spec.S) {
 					},
 					Composer: ComposerOptions{
 						Version:        "1.8.9",
-						GlobalOptions:  []string{},
-						InstallOptions: []string{},
+						GlobalOptions:  nil,
+						InstallOptions: nil,
 					},
 				}
 				err := WriteOptionsToBuildpackYAML(appRoot, options)
