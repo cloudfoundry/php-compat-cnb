@@ -3,10 +3,10 @@ module github.com/cloudfoundry/php-compat-cnb
 go 1.12
 
 require (
-	github.com/buildpack/libbuildpack v1.25.0
+	github.com/buildpack/libbuildpack v1.25.2
 	github.com/cloudfoundry/dagger v0.0.0-20191016144449-e21676fc28c9
 	github.com/cloudfoundry/httpd-cnb v0.0.19
-	github.com/cloudfoundry/libcfbuildpack v1.89.2
+	github.com/cloudfoundry/libcfbuildpack v1.89.4
 	github.com/cloudfoundry/nginx-cnb v0.0.33
 	github.com/cloudfoundry/php-composer-cnb v0.0.18
 	github.com/google/go-cmp v0.3.0
