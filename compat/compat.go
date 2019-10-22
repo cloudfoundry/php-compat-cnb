@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/cloudfoundry/libcfbuildpack/detect"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -44,12 +43,17 @@ func (c Contributor) Contribute() error {
 		return err
 	}
 
+	err = c.ErrorIfShouldHaveMovedWebFilesToWebDir(options)
+	if err != nil {
+		return err
+	}
+
 	if strings.ToLower(options.Composer.Version) == "latest" {
 		options.Composer.Version = ""
 		c.log.BodyWarning("Specifying a version of 'latest' is no longer supported. The default version of the php-composer-cnb will be used instead.")
 	}
 
-	composerLocation, _ :=	composer.FindComposer(c.appRoot, "")
+	composerLocation, _ := composer.FindComposer(c.appRoot, "")
 	if composerLocation != "" {
 		c.log.BodyWarning("Attention: some lesser used Composer configuration options have been removed.")
 		c.log.BodyWarning("- The vendor directory is no longer migrated to LIBDIR. You may need to adjust your code to use a relative path to Composer dependencies.")
@@ -177,6 +181,30 @@ func (c Contributor) ErrorOnCustomServerConfig(serverName string, folderName str
 	return nil
 }
 
+func (c Contributor) ErrorIfShouldHaveMovedWebFilesToWebDir(options Options) error {
+	isWebApp, err := helper.FileExists(filepath.Join(c.appRoot, "index.php"))
+	if err != nil {
+		return err
+	}
+
+	webDir := "htdocs"
+	if options.PHP.WebDir != "" {
+		webDir = options.PHP.WebDir
+	}
+	webDirPath := filepath.Join(c.appRoot, webDir)
+	webDirExists, err := helper.FileExists(webDirPath)
+	if err != nil {
+		return err
+	}
+
+	if isWebApp && !webDirExists {
+		c.log.BodyError("WEBDIR doesn't exist, we no longer move files into WEBDIR. Please create WEBDIR and push your app again.")
+		return errors.New("files no longer moved into WEBDIR")
+	}
+
+	return nil
+}
+
 type Options struct {
 	HTTPD    HTTPDOptions    `yaml:"httpd"`
 	PHP      PHPOptions      `yaml:"php"`
@@ -205,13 +233,13 @@ type NginxOptions struct {
 }
 
 type ComposerOptions struct {
-	Version string `json:"COMPOSER_VERSION" yaml:"version,omitempty"`
-	Path    string `yaml:"json_path,omitempty"`
-	GlobalOptions []string `json:"COMPOSER_INSTALL_GLOBAL" yaml:"install_global,omitempty"`
-	InstallOptions []string `json:"COMPOSER_INSTALL_OPTIONS" yaml:"install_options,omitempty"`
-	VendorDirectory string `json:"COMPOSER_VENDOR_DIR" yaml:"vendor_directory,omitempty"`
-	BinDirectory string `json:"COMPOSER_BIN_DIR" yaml:"-"`
-	CacheDirectory string `json:"COMPOSER_CACHE_DIR" yaml:"-"`
+	Version         string   `json:"COMPOSER_VERSION" yaml:"version,omitempty"`
+	Path            string   `yaml:"json_path,omitempty"`
+	GlobalOptions   []string `json:"COMPOSER_INSTALL_GLOBAL" yaml:"install_global,omitempty"`
+	InstallOptions  []string `json:"COMPOSER_INSTALL_OPTIONS" yaml:"install_options,omitempty"`
+	VendorDirectory string   `json:"COMPOSER_VENDOR_DIR" yaml:"vendor_directory,omitempty"`
+	BinDirectory    string   `json:"COMPOSER_BIN_DIR" yaml:"-"`
+	CacheDirectory  string   `json:"COMPOSER_CACHE_DIR" yaml:"-"`
 }
 
 // LoadOptionsJSON loads the options.json file from disk
@@ -295,30 +323,6 @@ func WriteOptionsToBuildpackYAML(appRoot string, options Options) error {
 	err = ioutil.WriteFile(filepath.Join(appRoot, "buildpack.yml"), optionsBytes, 0655)
 	if err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func ErrorIfShouldHaveMovedWebFilesToWebDir(options Options, context detect.Detect) error {
-	isWebApp, err := helper.FileExists(filepath.Join(context.Application.Root, "index.php"))
-	if err != nil {
-		return err
-	}
-
-	webDir := "htdocs"
-	if options.PHP.WebDir != "" {
-		webDir = options.PHP.WebDir
-	}
-	webDirPath := filepath.Join(context.Application.Root, webDir)
-	webDirExists, err := helper.FileExists(webDirPath)
-	if err != nil {
-		return err
-	}
-
-	if isWebApp && !webDirExists {
-		context.Logger.BodyError("WEBDIR doesn't exist, we no longer move files into WEBDIR. Please create WEBDIR and push your app again.")
-		return errors.New("files no longer moved into WEBDIR")
 	}
 
 	return nil

@@ -73,6 +73,18 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			Expect(err.Error()).To(ContainSubstring("WEBDIR doesn't exist, we no longer move files into WEBDIR. Please create WEBDIR and push your app again."))
 		})
 
+		it("serves a php app with no v2 compatibilities", func() {
+			app, err = PushSimpleApp("simple_app_v3", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(app.BuildLogs()).ToNot(ContainSubstring("WEBDIR doesn't exist, we no longer move files into WEBDIR. Please create WEBDIR and push your app again."))
+			Expect(app.BuildLogs()).ToNot(ContainSubstring("Please migrate your configuration, see the Migration guide for more details."))
+
+			body, _, err := app.HTTPGet("/")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(body).To(ContainSubstring("Hello World!"))
+		})
+
 		it("serves a cake php app with remote dependencies", func() {
 			app, err = PushSimpleApp("cake_remote_deps", []string{httpdURI, phpCompatURI, phpDistURI, composerURI, phpWebURI}, false)
 			Expect(err).ToNot(HaveOccurred())

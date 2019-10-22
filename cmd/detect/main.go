@@ -42,23 +42,9 @@ func runDetect(context detect.Detect) (int, error) {
 		return context.Fail(), nil
 	}
 
-	_, composerPathSet := os.LookupEnv("COMPOSER_PATH")
-	bpConfigExists, err := helper.FileExists(filepath.Join(context.Application.Root, ".bp-config"))
-	if err != nil {
-		return context.Fail(), err
-	}
-
 	options, err := compat.LoadOptionsJSON(context.Application.Root)
 	if err != nil {
 		return context.Fail(), err
-	}
-	err = compat.ErrorIfShouldHaveMovedWebFilesToWebDir(options, context)
-	if err != nil {
-		return context.Fail(), err
-	}
-
-	if !composerPathSet && !bpConfigExists {
-		return context.Fail(), nil
 	}
 
 	plan := buildplan.Plan{
