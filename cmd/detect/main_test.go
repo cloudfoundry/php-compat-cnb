@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/cloudfoundry/libcfbuildpack/detect"
-	"github.com/cloudfoundry/libcfbuildpack/helper"
-	. "github.com/onsi/gomega"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cloudfoundry/libcfbuildpack/detect"
+	"github.com/cloudfoundry/libcfbuildpack/helper"
+	. "github.com/onsi/gomega"
 
 	"github.com/cloudfoundry/libcfbuildpack/test"
 	"github.com/sclevine/spec"
@@ -25,12 +26,12 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		factory = test.NewDetectFactory(t)
 	})
 
-	when("a COMPOSER_PATH is set", func(){
+	when("a COMPOSER_PATH is set", func() {
 		it.Before(func() {
 			os.Setenv("COMPOSER_PATH", "some/composer/path")
 		})
 
-		it.After(func(){
+		it.After(func() {
 			os.Unsetenv("COMPOSER_PATH")
 		})
 
@@ -102,13 +103,13 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 	})
 
-	when("a COMPOSER_PATH is not set and", func(){
+	when("a COMPOSER_PATH is not set and", func() {
 		when(".bp-config does not exist", func() {
 			it("fails detect", func() {
 				code, err := runDetect(factory.Detect)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(code).To(Equal(detect.FailStatusCode))
+				Expect(code).To(Equal(detect.PassStatusCode))
 			})
 		})
 	})

@@ -2,12 +2,13 @@ package compat
 
 import (
 	"bytes"
-	bplog "github.com/buildpack/libbuildpack/logger"
-	"github.com/cloudfoundry/libcfbuildpack/logger"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	bplog "github.com/buildpack/libbuildpack/logger"
+	"github.com/cloudfoundry/libcfbuildpack/logger"
 
 	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
@@ -321,13 +322,19 @@ func testCompat(t *testing.T, when spec.G, it spec.S) {
 		})
 	})
 
-	when("detecting and", func() {
-		var factory *test.DetectFactory
+	when("building and", func() {
+		var contributor Contributor
 		var appRoot string
 
 		it.Before(func() {
-			factory = test.NewDetectFactory(t)
-			appRoot = factory.Detect.Application.Root
+			factory := test.NewBuildFactory(t)
+			factory.AddPlan(buildpackplan.Plan{Name: Layer})
+
+			var err error
+			contributor, _, err = NewContributor(factory.Build)
+			Expect(err).ToNot(HaveOccurred())
+
+			appRoot = factory.Build.Application.Root
 		})
 
 		when("we have a web app", func() {
@@ -353,7 +360,7 @@ func testCompat(t *testing.T, when spec.G, it spec.S) {
 							LibDir: "lib",
 						},
 					}
-					err := ErrorIfShouldHaveMovedWebFilesToWebDir(options, factory.Detect)
+					err := contributor.ErrorIfShouldHaveMovedWebFilesToWebDir(options)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -378,9 +385,8 @@ func testCompat(t *testing.T, when spec.G, it spec.S) {
 							LibDir: "lib",
 						},
 					}
-					err := ErrorIfShouldHaveMovedWebFilesToWebDir(options, factory.Detect)
-					Expect(err).To(HaveOccurred())
-					Expect(err.Error()).To(Equal("files no longer moved into WEBDIR"))
+					err := contributor.ErrorIfShouldHaveMovedWebFilesToWebDir(options)
+					Expect(err).To(MatchError("files no longer moved into WEBDIR"))
 				})
 			})
 
@@ -407,7 +413,7 @@ func testCompat(t *testing.T, when spec.G, it spec.S) {
 							LibDir: "lib",
 						},
 					}
-					err := ErrorIfShouldHaveMovedWebFilesToWebDir(options, factory.Detect)
+					err := contributor.ErrorIfShouldHaveMovedWebFilesToWebDir(options)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -433,9 +439,8 @@ func testCompat(t *testing.T, when spec.G, it spec.S) {
 							LibDir: "lib",
 						},
 					}
-					err := ErrorIfShouldHaveMovedWebFilesToWebDir(options, factory.Detect)
-					Expect(err).To(HaveOccurred())
-					Expect(err.Error()).To(Equal("files no longer moved into WEBDIR"))
+					err := contributor.ErrorIfShouldHaveMovedWebFilesToWebDir(options)
+					Expect(err).To(MatchError("files no longer moved into WEBDIR"))
 				})
 			})
 		})
@@ -465,7 +470,7 @@ func testCompat(t *testing.T, when spec.G, it spec.S) {
 						LibDir: "lib",
 					},
 				}
-				err := ErrorIfShouldHaveMovedWebFilesToWebDir(options, factory.Detect)
+				err := contributor.ErrorIfShouldHaveMovedWebFilesToWebDir(options)
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
