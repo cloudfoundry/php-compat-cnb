@@ -38,8 +38,8 @@ func TestIntegration(t *testing.T) {
 
 func testIntegration(t *testing.T, when spec.G, it spec.S) {
 	var (
-		app    *dagger.App
-		err    error
+		app *dagger.App
+		err error
 	)
 
 	it.After(func() {

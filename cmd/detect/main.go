@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/httpd-cnb/httpd"
 	"github.com/cloudfoundry/nginx-cnb/nginx"
-	"path/filepath"
 
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/php-compat-cnb/compat"
@@ -47,10 +48,6 @@ func runDetect(context detect.Detect) (int, error) {
 		return context.Fail(), err
 	}
 
-	if !composerPathSet && !bpConfigExists {
-		return context.Fail(), nil
-	}
-
 	options, err := compat.LoadOptionsJSON(context.Application.Root)
 	if err != nil {
 		return context.Fail(), err
@@ -58,6 +55,10 @@ func runDetect(context detect.Detect) (int, error) {
 	err = compat.ErrorIfShouldHaveMovedWebFilesToWebDir(options, context)
 	if err != nil {
 		return context.Fail(), err
+	}
+
+	if !composerPathSet && !bpConfigExists {
+		return context.Fail(), nil
 	}
 
 	plan := buildplan.Plan{
@@ -83,12 +84,11 @@ func runDetect(context detect.Detect) (int, error) {
 			webServerVersion = options.Nginx.Version
 		}
 		plan.Requires = append(plan.Requires, buildplan.Required{
-			Name: webServer,
-			Version: webServerVersion,
+			Name:     webServer,
+			Version:  webServerVersion,
 			Metadata: buildplan.Metadata{"launch": true},
 		})
 	}
 
 	return context.Pass(plan)
 }
-
