@@ -43,7 +43,7 @@ github.com/cloudfoundry/packit
 # github.com/cloudfoundry/php-composer-cnb v0.0.18
 github.com/cloudfoundry/php-composer-cnb/composer
 github.com/cloudfoundry/php-composer-cnb/runner
-# github.com/cloudfoundry/php-dist-cnb v0.0.29
+# github.com/cloudfoundry/php-dist-cnb v0.0.60
 github.com/cloudfoundry/php-dist-cnb/php
 # github.com/cloudfoundry/php-web-cnb v0.0.21
 github.com/cloudfoundry/php-web-cnb/config

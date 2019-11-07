@@ -9,6 +9,7 @@ require (
 	github.com/cloudfoundry/libcfbuildpack v1.91.3
 	github.com/cloudfoundry/nginx-cnb v0.0.33
 	github.com/cloudfoundry/php-composer-cnb v0.0.18
+	github.com/cloudfoundry/php-dist-cnb v0.0.60 // indirect
 	github.com/google/go-cmp v0.3.0
 	github.com/onsi/gomega v1.7.1
 	github.com/sclevine/spec v1.3.0
