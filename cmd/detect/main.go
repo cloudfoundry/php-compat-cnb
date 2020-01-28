@@ -47,8 +47,12 @@ func runDetect(context detect.Detect) (int, error) {
 		return context.Fail(), err
 	}
 
+	// we fake provides for httpd.Dependency because nothing provides httpd when using Nginx
+	// but php-web-cnb will require HTTPD because that is the default and it doesn't know
+	// at detect time that it should be using Nginx. It is OK though because it will know
+	// to use Nginx at build time
 	plan := buildplan.Plan{
-		Provides: []buildplan.Provided{{Name: compat.Layer}},
+		Provides: []buildplan.Provided{{Name: compat.Layer}, {Name: httpd.Dependency}},
 		Requires: []buildplan.Required{{Name: compat.Layer}},
 	}
 

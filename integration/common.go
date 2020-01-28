@@ -68,7 +68,13 @@ func MakeBuildEnv(debug bool) map[string]string {
 }
 
 func PreparePhpApp(appName string, buildpacks []string, debug bool) (*dagger.App, error) {
-	app, err := dagger.PackBuildWithEnv(filepath.Join("testdata", appName), MakeBuildEnv(debug), buildpacks...)
+	app, err := dagger.NewPack(
+		filepath.Join("testdata", appName),
+		dagger.RandomImage(),
+		dagger.SetEnv(MakeBuildEnv(debug)),
+		dagger.SetBuildpacks(buildpacks...),
+		dagger.SetVerbose(),
+	).Build()
 	if err != nil {
 		return &dagger.App{}, err
 	}

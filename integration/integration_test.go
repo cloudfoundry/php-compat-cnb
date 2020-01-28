@@ -65,6 +65,17 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			Expect(err.Error()).To(ContainSubstring("Found 1 Nginx configuration files under `.bp-config/nginx`. Customizing Nginx configuration in this manner is no longer supported. Please migrate your configuration, see the Migration guide for more details."))
 		})
 
+		it.Focus("serves a simple php page and runs", func() {
+			app, err = PushSimpleApp("simple_app_nginx_run", []string{nginxURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			Expect(err).ToNot(HaveOccurred())
+
+			// because it fails, the error contains the build logs, not app.BuildLogs()
+			appLogs, err := app.Logs()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(appLogs).To(ContainSubstring("start worker processes"))
+			Expect(appLogs).To(ContainSubstring("ready to handle connections"))
+		})
+
 		it("serves a simple php page which requires files to be moved into WEBDIR", func() {
 			app, err = PushSimpleApp("simple_app_moves_files", []string{httpdURI, phpCompatURI}, false)
 			Expect(err).To(HaveOccurred())
