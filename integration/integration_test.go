@@ -32,7 +32,7 @@ func TestIntegration(t *testing.T) {
 
 	err := PreparePhpBps()
 	Expect(err).ToNot(HaveOccurred())
-	spec.Run(t, "Integration", testIntegration, spec.Report(report.Terminal{}))
+	spec.Run(t, "Integration", testIntegration, spec.Report(report.Terminal{}), spec.Parallel())
 	CleanUpBps()
 }
 
@@ -65,7 +65,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			Expect(err.Error()).To(ContainSubstring("Found 1 Nginx configuration files under `.bp-config/nginx`. Customizing Nginx configuration in this manner is no longer supported. Please migrate your configuration, see the Migration guide for more details."))
 		})
 
-		it.Focus("serves a simple php page and runs", func() {
+		it("serves a simple php page and runs", func() {
 			app, err = PushSimpleApp("simple_app_nginx_run", []string{nginxURI, phpCompatURI, phpDistURI, phpWebURI}, false)
 			Expect(err).ToNot(HaveOccurred())
 
