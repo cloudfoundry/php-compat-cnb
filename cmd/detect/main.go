@@ -47,18 +47,17 @@ func runDetect(context detect.Detect) (int, error) {
 		return context.Fail(), err
 	}
 
-	// we fake provides for httpd.Dependency because nothing provides httpd when using Nginx
-	// but php-web-cnb will require HTTPD because that is the default and it doesn't know
-	// at detect time that it should be using Nginx. It is OK though because it will know
-	// to use Nginx at build time
 	plan := buildplan.Plan{
 		Provides: []buildplan.Provided{{Name: compat.Layer}},
 		Requires: []buildplan.Required{{Name: compat.Layer}},
 	}
 
-	webDirExists, err := helper.FileExists(filepath.Join(context.Application.Root, options.PHP.WebDir))
-	if err != nil {
-		return context.Fail(), err
+	webDirExists := false
+	if options.PHP.WebDir != "" {
+		webDirExists, err = helper.FileExists(filepath.Join(context.Application.Root, options.PHP.WebDir))
+		if err != nil {
+			return context.Fail(), err
+		}
 	}
 
 	if webDirExists {
@@ -73,6 +72,11 @@ func runDetect(context detect.Detect) (int, error) {
 		} else if webServer == nginx.Dependency {
 			webServerVersion = options.Nginx.Version
 		}
+
+		// we fake provides for httpd.Dependency because nothing provides httpd when using Nginx
+		// but php-web-cnb will require HTTPD because that is the default and it doesn't know
+		// at detect time that it should be using Nginx. It is OK though because it will know
+		// to use Nginx at build time
 		plan.Provides = append(plan.Provides, buildplan.Provided{Name: httpd.Dependency})
 		plan.Requires = append(plan.Requires, buildplan.Required{
 			Name:     webServer,

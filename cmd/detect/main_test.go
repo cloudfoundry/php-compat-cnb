@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/buildpack/libbuildpack/buildplan"
 	"os"
 	"path/filepath"
 	"testing"
@@ -111,6 +112,44 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 				Expect(code).To(Equal(detect.PassStatusCode))
 			})
+		})
+	})
+
+	when("WEBDIR is not set", func() {
+		it("provides and requires only itself", func() {
+			code, err := runDetect(factory.Detect)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(code).To(Equal(detect.PassStatusCode))
+
+			Expect(factory.Plans.Plan).To(Equal(
+				buildplan.Plan{
+					Provides: []buildplan.Provided{{Name: "php-compat"}},
+					Requires: []buildplan.Required{{Name: "php-compat"}},
+				},
+			))
+		})
+	})
+
+	when("WEBDIR is set", func() {
+		
+		it("additionally provides httpd", func() {
+			err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".bp-config/options.json"), 0644, `{"WEBDIR": "public"}`)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = helper.WriteFile(filepath.Join(factory.Detect.Application.Root, "public/index.php"), 0755, "")
+			Expect(err).ToNot(HaveOccurred())
+
+			code, err := runDetect(factory.Detect)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(code).To(Equal(detect.PassStatusCode))
+
+			Expect(factory.Plans.Plan).To(Equal(
+				buildplan.Plan{
+					Provides: []buildplan.Provided{{Name: "php-compat"}, {Name: "httpd"}},
+					Requires: []buildplan.Required{{Name: "php-compat"},
+						{Name: "httpd", Metadata: map[string]interface{}{"launch": true}}},
+				},
+			))
 		})
 	})
 }
