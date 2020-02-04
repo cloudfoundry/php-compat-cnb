@@ -58,6 +58,11 @@ func runDetect(context detect.Detect) (int, error) {
 		if err != nil {
 			return context.Fail(), err
 		}
+	} else {
+		webDirExists, err = helper.FileExists(filepath.Join(context.Application.Root, "htdocs"))
+		if err != nil {
+			return context.Fail(), err
+		}
 	}
 
 	if webDirExists {

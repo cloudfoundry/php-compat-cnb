@@ -116,17 +116,38 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("WEBDIR is not set", func() {
-		it("provides and requires only itself", func() {
-			code, err := runDetect(factory.Detect)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(code).To(Equal(detect.PassStatusCode))
+		when("htdocs folder does not exist", func() {
+			it("provides and requires only itself", func() {
+				code, err := runDetect(factory.Detect)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(code).To(Equal(detect.PassStatusCode))
 
-			Expect(factory.Plans.Plan).To(Equal(
-				buildplan.Plan{
-					Provides: []buildplan.Provided{{Name: "php-compat"}},
-					Requires: []buildplan.Required{{Name: "php-compat"}},
-				},
-			))
+				Expect(factory.Plans.Plan).To(Equal(
+					buildplan.Plan{
+						Provides: []buildplan.Provided{{Name: "php-compat"}},
+						Requires: []buildplan.Required{{Name: "php-compat"}},
+					},
+				))
+			})
+		})
+		when("htdocs folder exists", func() {
+			it.Before(func() {
+				err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, "htdocs/index.php"), 0644, "")
+				Expect(err).ToNot(HaveOccurred())
+			})
+			it("additionally provides httpd", func() {
+				code, err := runDetect(factory.Detect)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(code).To(Equal(detect.PassStatusCode))
+
+				Expect(factory.Plans.Plan).To(Equal(
+					buildplan.Plan{
+						Provides: []buildplan.Provided{{Name: "php-compat"}, {Name: "httpd"}},
+						Requires: []buildplan.Required{{Name: "php-compat"},
+							{Name: "httpd", Metadata: map[string]interface{}{"launch": true}}},
+					},
+				))
+			})
 		})
 	})
 
@@ -136,7 +157,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".bp-config/options.json"), 0644, `{"WEBDIR": "public"}`)
 			Expect(err).ToNot(HaveOccurred())
 
-			err = helper.WriteFile(filepath.Join(factory.Detect.Application.Root, "public/index.php"), 0755, "")
+			err = helper.WriteFile(filepath.Join(factory.Detect.Application.Root, "public/index.php"), 0644, "")
 			Expect(err).ToNot(HaveOccurred())
 
 			code, err := runDetect(factory.Detect)

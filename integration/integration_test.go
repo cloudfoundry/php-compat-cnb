@@ -50,7 +50,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 
 	when("deploying the simple_app fixture", func() {
 		it("serves a simple php page with custom httpd config", func() {
-			app, err = PushSimpleApp("simple_app_httpd", []string{httpdURI, phpCompatURI}, false)
+			app, err = PushSimpleApp("simple_app_httpd", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
 			Expect(err).To(HaveOccurred())
 
 			// because it fails, the error contains the build logs, not app.BuildLogs()
@@ -58,7 +58,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("serves a simple php page with custom nginx config", func() {
-			app, err = PushSimpleApp("simple_app_nginx", []string{httpdURI, phpCompatURI}, false)
+			app, err = PushSimpleApp("simple_app_nginx", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
 			Expect(err).To(HaveOccurred())
 
 			// because it fails, the error contains the build logs, not app.BuildLogs()
@@ -85,7 +85,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("serves a simple php page which requires files to be moved into WEBDIR", func() {
-			app, err = PushSimpleApp("simple_app_moves_files", []string{httpdURI, phpCompatURI}, false)
+			app, err = PushSimpleApp("simple_app_moves_files", []string{phpCompatURI}, false)
 			Expect(err).To(HaveOccurred())
 
 			// because it fails, the error contains the build logs, not app.BuildLogs()
