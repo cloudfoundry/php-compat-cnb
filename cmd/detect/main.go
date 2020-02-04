@@ -52,7 +52,7 @@ func runDetect(context detect.Detect) (int, error) {
 	// at detect time that it should be using Nginx. It is OK though because it will know
 	// to use Nginx at build time
 	plan := buildplan.Plan{
-		Provides: []buildplan.Provided{{Name: compat.Layer}, {Name: httpd.Dependency}},
+		Provides: []buildplan.Provided{{Name: compat.Layer}},
 		Requires: []buildplan.Required{{Name: compat.Layer}},
 	}
 
@@ -73,6 +73,7 @@ func runDetect(context detect.Detect) (int, error) {
 		} else if webServer == nginx.Dependency {
 			webServerVersion = options.Nginx.Version
 		}
+		plan.Provides = append(plan.Provides, buildplan.Provided{Name: httpd.Dependency})
 		plan.Requires = append(plan.Requires, buildplan.Required{
 			Name:     webServer,
 			Version:  webServerVersion,

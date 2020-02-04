@@ -69,11 +69,19 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			app, err = PushSimpleApp("simple_app_nginx_run", []string{nginxURI, phpCompatURI, phpDistURI, phpWebURI}, false)
 			Expect(err).ToNot(HaveOccurred())
 
-			// because it fails, the error contains the build logs, not app.BuildLogs()
 			appLogs, err := app.Logs()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(appLogs).To(ContainSubstring("start worker processes"))
 			Expect(appLogs).To(ContainSubstring("ready to handle connections"))
+		})
+
+		it("runs a script-only app", func() {
+			app, err = PushSimpleApp("script_app", []string{phpCompatURI, phpDistURI, phpWebURI}, true)
+			Expect(err).ToNot(HaveOccurred())
+
+			appLogs, err := app.Logs()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(appLogs).To(ContainSubstring("Hello World!"))
 		})
 
 		it("serves a simple php page which requires files to be moved into WEBDIR", func() {
