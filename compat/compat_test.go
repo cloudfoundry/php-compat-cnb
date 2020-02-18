@@ -103,6 +103,14 @@ func testCompat(t *testing.T, when spec.G, it spec.S) {
 			})
 		})
 
+		when("options.json does not exist", func() {
+			it("loads PHP_DEFAULT", func() {
+				options, err := LoadOptionsJSON(appRoot)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(options.PHP.WebServer).To(Equal("httpd"))
+			})
+		})
+
 		when("options.json exists and there are specific version requirements", func() {
 			it("loads PHP_DEFAULT", func() {
 				json := `{"PHP_VERSION": "{PHP_DEFAULT}"}`

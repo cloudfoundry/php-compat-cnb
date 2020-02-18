@@ -246,7 +246,9 @@ type ComposerOptions struct {
 func LoadOptionsJSON(appRoot string) (Options, error) {
 	configFile := filepath.Join(appRoot, ".bp-config", "options.json")
 
-	phpOptions := PHPOptions{}
+	phpOptions := PHPOptions{
+		WebServer: "httpd",
+	}
 	httpdOptions := HTTPDOptions{}
 	nginxOptions := NginxOptions{}
 	composerOptions := ComposerOptions{}
