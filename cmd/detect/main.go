@@ -78,11 +78,6 @@ func runDetect(context detect.Detect) (int, error) {
 			webServerVersion = options.Nginx.Version
 		}
 
-		// we fake provides for httpd.Dependency because nothing provides httpd when using Nginx
-		// but php-web-cnb will require HTTPD because that is the default and it doesn't know
-		// at detect time that it should be using Nginx. It is OK though because it will know
-		// to use Nginx at build time
-		plan.Provides = append(plan.Provides, buildplan.Provided{Name: httpd.Dependency})
 		plan.Requires = append(plan.Requires, buildplan.Required{
 			Name:     webServer,
 			Version:  webServerVersion,

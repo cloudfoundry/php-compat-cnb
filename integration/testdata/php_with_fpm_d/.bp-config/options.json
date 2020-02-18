@@ -1,3 +1,4 @@
 {
-    "PHP_VERSION": "{PHP_71_LATEST}"
+    "PHP_VERSION": "{PHP_71_LATEST}",
+    "WEB_SERVER": "httpd"
 }

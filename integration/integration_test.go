@@ -134,7 +134,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 
 			body, _, err := app.HTTPGet("/")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(body).To(ContainSubstring("TEST_WEBDIR == htdocs"))
+			Expect(body).To(ContainSubstring("TEST_WEBDIR == htdocs"), app.BuildLogs())
 			Expect(body).To(ContainSubstring("TEST_HOME_PATH == /workspace/test/path"))
 		})
 

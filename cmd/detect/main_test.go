@@ -142,7 +142,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 				Expect(factory.Plans.Plan).To(Equal(
 					buildplan.Plan{
-						Provides: []buildplan.Provided{{Name: "php-compat"}, {Name: "httpd"}},
+						Provides: []buildplan.Provided{{Name: "php-compat"}},
 						Requires: []buildplan.Required{{Name: "php-compat"},
 							{Name: "httpd", Metadata: map[string]interface{}{"launch": true}}},
 					},
@@ -166,7 +166,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 			Expect(factory.Plans.Plan).To(Equal(
 				buildplan.Plan{
-					Provides: []buildplan.Provided{{Name: "php-compat"}, {Name: "httpd"}},
+					Provides: []buildplan.Provided{{Name: "php-compat"}},
 					Requires: []buildplan.Required{{Name: "php-compat"},
 						{Name: "httpd", Metadata: map[string]interface{}{"launch": true}}},
 				},
