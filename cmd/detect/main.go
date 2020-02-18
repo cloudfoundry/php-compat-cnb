@@ -34,6 +34,20 @@ func main() {
 }
 
 func runDetect(context detect.Detect) (int, error) {
+	optionsExists, err := helper.FileExists(filepath.Join(context.Application.Root, ".bp-config", "options.json"))
+	if err != nil {
+		return context.Fail(), err
+	}
+
+	bpYAMLExists, err := helper.FileExists(filepath.Join(context.Application.Root, "buildpack.yml"))
+	if err != nil {
+		return context.Fail(), err
+	}
+
+	if bpYAMLExists && !optionsExists {
+		return context.Fail(), nil
+	}
+
 	extensionsExists, err := helper.FileExists(filepath.Join(context.Application.Root, ".extensions"))
 	if err != nil {
 		return context.Fail(), err

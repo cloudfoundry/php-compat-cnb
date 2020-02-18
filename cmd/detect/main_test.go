@@ -221,4 +221,15 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			))
 		})
 	})
+
+	when("the buildpack.yml is present and the options.json is missing", func() {
+		it("fails detection", func() {
+			err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, "buildpack.yml"), 0644, ``)
+			Expect(err).ToNot(HaveOccurred())
+
+			code, err := runDetect(factory.Detect)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(code).To(Equal(detect.FailStatusCode))
+		})
+	})
 }
