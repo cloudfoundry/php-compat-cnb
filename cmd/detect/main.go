@@ -78,11 +78,13 @@ func runDetect(context detect.Detect) (int, error) {
 			webServerVersion = options.Nginx.Version
 		}
 
-		plan.Requires = append(plan.Requires, buildplan.Required{
-			Name:     webServer,
-			Version:  webServerVersion,
-			Metadata: buildplan.Metadata{"launch": true},
-		})
+		if webServer != "php-server" {
+			plan.Requires = append(plan.Requires, buildplan.Required{
+				Name:     webServer,
+				Version:  webServerVersion,
+				Metadata: buildplan.Metadata{"launch": true},
+			})
+		}
 	}
 
 	return context.Pass(plan)

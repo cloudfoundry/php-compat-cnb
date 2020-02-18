@@ -135,7 +135,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 				err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, "htdocs/index.php"), 0644, "")
 				Expect(err).ToNot(HaveOccurred())
 			})
-			it("additionally provides httpd", func() {
+			it("requires a web server", func() {
 				code, err := runDetect(factory.Detect)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(code).To(Equal(detect.PassStatusCode))
@@ -152,8 +152,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("WEBDIR is set", func() {
-		
-		it("additionally provides httpd", func() {
+		it("requires a web server", func() {
 			err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".bp-config/options.json"), 0644, `{"WEBDIR": "public"}`)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -169,6 +168,27 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 					Provides: []buildplan.Provided{{Name: "php-compat"}},
 					Requires: []buildplan.Required{{Name: "php-compat"},
 						{Name: "httpd", Metadata: map[string]interface{}{"launch": true}}},
+				},
+			))
+		})
+	})
+
+	when("the web server is php-server", func() {
+		it("requires a web server", func() {
+			err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".bp-config/options.json"), 0644, `{"WEB_SERVER": "php-server"}`)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = helper.WriteFile(filepath.Join(factory.Detect.Application.Root, "htdocs/index.php"), 0644, "")
+			Expect(err).ToNot(HaveOccurred())
+
+			code, err := runDetect(factory.Detect)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(code).To(Equal(detect.PassStatusCode))
+
+			Expect(factory.Plans.Plan).To(Equal(
+				buildplan.Plan{
+					Provides: []buildplan.Provided{{Name: "php-compat"}},
+					Requires: []buildplan.Required{{Name: "php-compat"}},
 				},
 			))
 		})
