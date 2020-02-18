@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/buildpack/libbuildpack/buildplan"
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
+	"github.com/cloudfoundry/php-dist-cnb/php"
 	"os"
 	"path/filepath"
 	"testing"
@@ -100,6 +102,32 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(code).To(Equal(detect.PassStatusCode))
+			})
+		})
+
+		when("a PHP version is present", func() {
+			it.Before(func() {
+				err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".bp-config", "options.json"), 0644, `{"PHP_VERSION": "{PHP_72_LATEST}"}`)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			it("the version is included in a buildplan requirement", func() {
+				code, err := runDetect(factory.Detect)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(code).To(Equal(detect.PassStatusCode))
+				Expect(factory.Plans.Plan).To(Equal(
+					buildplan.Plan{
+						Provides: []buildplan.Provided{{Name: "php-compat"}},
+						Requires: []buildplan.Required{
+							{Name: "php-compat"},
+							{Name: "php", Version: "7.2.*", Metadata: buildplan.Metadata{
+								"launch": true,
+								buildpackplan.VersionSource: php.BuildpackYAMLSource,
+							}},
+						},
+					},
+				))
 			})
 		})
 	})

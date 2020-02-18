@@ -122,16 +122,6 @@ func testCompat(t *testing.T, when spec.G, it spec.S) {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(options.PHP.Version).To(BeEmpty())
 			})
-			it("loads PHP_71_LATEST", func() {
-				json := `{"PHP_VERSION": "{PHP_71_LATEST}"}`
-				err := writeOptionsJSON(appRoot, json)
-				Expect(err).ToNot(HaveOccurred())
-				defer os.RemoveAll(filepath.Join(appRoot, ".bp-config"))
-
-				options, err := LoadOptionsJSON(appRoot)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(options.PHP.Version).To(Equal("7.1.*"))
-			})
 			it("loads PHP_72_LATEST", func() {
 				json := `{"PHP_VERSION": "{PHP_72_LATEST}"}`
 				err := writeOptionsJSON(appRoot, json)
@@ -152,7 +142,16 @@ func testCompat(t *testing.T, when spec.G, it spec.S) {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(options.PHP.Version).To(Equal("7.3.*"))
 			})
+			it("loads PHP_74_LATEST", func() {
+				json := `{"PHP_VERSION": "{PHP_74_LATEST}"}`
+				err := writeOptionsJSON(appRoot, json)
+				Expect(err).ToNot(HaveOccurred())
+				defer os.RemoveAll(filepath.Join(appRoot, ".bp-config"))
 
+				options, err := LoadOptionsJSON(appRoot)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(options.PHP.Version).To(Equal("7.4.*"))
+			})
 		})
 
 		when("options need to be written", func() {

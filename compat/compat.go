@@ -297,14 +297,14 @@ func setPhpDefaultVersions(phpOptions *PHPOptions) {
 	if phpOptions.Version == "{PHP_DEFAULT}" {
 		phpOptions.Version = ""
 	}
-	if phpOptions.Version == "{PHP_71_LATEST}" {
-		phpOptions.Version = "7.1.*"
-	}
 	if phpOptions.Version == "{PHP_72_LATEST}" {
 		phpOptions.Version = "7.2.*"
 	}
 	if phpOptions.Version == "{PHP_73_LATEST}" {
 		phpOptions.Version = "7.3.*"
+	}
+	if phpOptions.Version == "{PHP_74_LATEST}" {
+		phpOptions.Version = "7.4.*"
 	}
 }
 

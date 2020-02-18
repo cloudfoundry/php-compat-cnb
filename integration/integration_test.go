@@ -50,7 +50,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 
 	when("deploying the simple_app fixture", func() {
 		it("serves a simple php page with custom httpd config", func() {
-			app, err = PushSimpleApp("simple_app_httpd", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			app, err = PushSimpleApp("simple_app_httpd", []string{httpdURI, phpDistURI, phpCompatURI, phpWebURI}, false)
 			Expect(err).To(HaveOccurred())
 
 			// because it fails, the error contains the build logs, not app.BuildLogs()
@@ -58,7 +58,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("serves a simple php page with custom nginx config", func() {
-			app, err = PushSimpleApp("simple_app_nginx", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			app, err = PushSimpleApp("simple_app_nginx", []string{httpdURI, phpDistURI, phpCompatURI, phpWebURI}, false)
 			Expect(err).To(HaveOccurred())
 
 			// because it fails, the error contains the build logs, not app.BuildLogs()
@@ -66,7 +66,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("serves a simple php page and runs", func() {
-			app, err = PushSimpleApp("simple_app_nginx_run", []string{nginxURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			app, err = PushSimpleApp("simple_app_nginx_run", []string{nginxURI, phpDistURI, phpCompatURI, phpWebURI}, false)
 			Expect(err).ToNot(HaveOccurred())
 
 			appLogs, err := app.Logs()
@@ -76,7 +76,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("runs a script-only app", func() {
-			app, err = PushSimpleApp("script_app", []string{phpCompatURI, phpDistURI, phpWebURI}, true)
+			app, err = PushSimpleApp("script_app", []string{phpDistURI, phpCompatURI, phpWebURI}, true)
 			Expect(err).ToNot(HaveOccurred())
 
 			appLogs, err := app.Logs()
@@ -93,7 +93,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("serves a php app with no v2 compatibilities", func() {
-			app, err = PushSimpleApp("simple_app_v3", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			app, err = PushSimpleApp("simple_app_v3", []string{httpdURI, phpDistURI, phpCompatURI, phpWebURI}, false)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(app.BuildLogs()).ToNot(ContainSubstring("WEBDIR doesn't exist, we no longer move files into WEBDIR. Please create WEBDIR and push your app again."))
@@ -105,7 +105,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("serves a cake php app with remote dependencies", func() {
-			app, err = PushSimpleApp("cake_remote_deps", []string{httpdURI, phpCompatURI, phpDistURI, composerURI, phpWebURI}, false)
+			app, err = PushSimpleApp("cake_remote_deps", []string{httpdURI, phpDistURI, phpCompatURI, composerURI, phpWebURI}, false)
 			Expect(err).ToNot(HaveOccurred())
 
 			body, _, err := app.HTTPGet("/")
@@ -120,7 +120,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("deploying a basic PHP app with custom conf files in php.ini.d dir in app root", func() {
-			app, err = PushSimpleApp("php_with_php_ini_d", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			app, err = PushSimpleApp("php_with_php_ini_d", []string{httpdURI, phpDistURI, phpCompatURI, phpWebURI}, false)
 			Expect(err).ToNot(HaveOccurred())
 
 			body, _, err := app.HTTPGet("/")
@@ -129,7 +129,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("deploying a basic PHP app with custom conf files in fpm.d dir in app root", func() {
-			app, err = PushSimpleApp("php_with_fpm_d", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			app, err = PushSimpleApp("php_with_fpm_d", []string{httpdURI, phpDistURI, phpCompatURI, phpWebURI}, false)
 			Expect(err).ToNot(HaveOccurred())
 
 			body, _, err := app.HTTPGet("/")
@@ -139,7 +139,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("deploying a basic PHP app that loads all prepackaged extensions", func() {
-			app, err = PushSimpleApp("php_all_modules", []string{httpdURI, phpCompatURI, phpDistURI, phpWebURI}, false)
+			app, err = PushSimpleApp("php_all_modules", []string{httpdURI, phpDistURI, phpCompatURI, phpWebURI}, false)
 			Expect(err).ToNot(HaveOccurred())
 
 			body, _, err := app.HTTPGet("/")
@@ -151,7 +151,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("deploying a basic PHP Symfony app", func() {
-			app, err = PushSimpleApp("symfony_service", []string{httpdURI, phpCompatURI, phpDistURI, composerURI, phpWebURI}, false)
+			app, err = PushSimpleApp("symfony_service", []string{httpdURI, phpDistURI, phpCompatURI, composerURI, phpWebURI}, false)
 			Expect(err).ToNot(HaveOccurred())
 
 			body, _, err := app.HTTPGet("/lucky/number")

@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
+	"github.com/cloudfoundry/php-dist-cnb/php"
 	"path/filepath"
 
 	"github.com/buildpack/libbuildpack/buildplan"
@@ -85,6 +87,17 @@ func runDetect(context detect.Detect) (int, error) {
 				Metadata: buildplan.Metadata{"launch": true},
 			})
 		}
+	}
+
+	if options.PHP.Version != "" {
+		plan.Requires = append(plan.Requires, buildplan.Required{
+			Name: php.Dependency,
+			Version: options.PHP.Version,
+			Metadata: buildplan.Metadata{
+				"launch": true,
+				buildpackplan.VersionSource: php.BuildpackYAMLSource,
+			},
+		})
 	}
 
 	return context.Pass(plan)
