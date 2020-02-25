@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
 	"github.com/cloudfoundry/php-dist-cnb/php"
-	"path/filepath"
 
 	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/httpd-cnb/httpd"
@@ -45,16 +46,6 @@ func runDetect(context detect.Detect) (int, error) {
 	}
 
 	if bpYAMLExists && !optionsExists {
-		return context.Fail(), nil
-	}
-
-	extensionsExists, err := helper.FileExists(filepath.Join(context.Application.Root, ".extensions"))
-	if err != nil {
-		return context.Fail(), err
-	}
-
-	if extensionsExists {
-		context.Logger.BodyError("Use of .extensions folder has been removed. Please remove this folder from your application.")
 		return context.Fail(), nil
 	}
 
@@ -105,10 +96,10 @@ func runDetect(context detect.Detect) (int, error) {
 
 	if options.PHP.Version != "" {
 		plan.Requires = append(plan.Requires, buildplan.Required{
-			Name: php.Dependency,
+			Name:    php.Dependency,
 			Version: options.PHP.Version,
 			Metadata: buildplan.Metadata{
-				"launch": true,
+				"launch":                    true,
 				buildpackplan.VersionSource: php.BuildpackYAMLSource,
 			},
 		})

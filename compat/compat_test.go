@@ -39,6 +39,28 @@ func testCompat(t *testing.T, when spec.G, it spec.S) {
 			appRoot = factory.Build.Application.Root
 		})
 
+		when(".extensions is present", func() {
+			it.Before(func() {
+				err := helper.WriteFile(filepath.Join(appRoot, ".extensions", "options.json"), 0x644, "{}")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			it.After(func() {
+				err := os.RemoveAll(filepath.Join(appRoot, ".extensions"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			it("fails build", func() {
+				contributor, _, err := NewContributor(factory.Build)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = contributor.CheckForPythonExtentions()
+
+				Expect(err).To(MatchError("Use of .extensions folder has been removed. Please remove this folder from your application."))
+			})
+
+		})
+
 		when("an options.json exists", func() {
 			it.Before(func() {
 				json := `{

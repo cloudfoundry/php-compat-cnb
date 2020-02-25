@@ -38,6 +38,11 @@ func NewContributor(context build.Build) (Contributor, bool, error) {
 }
 
 func (c Contributor) Contribute() error {
+	err := c.CheckForPythonExtentions()
+	if err != nil {
+		return err
+	}
+
 	options, err := LoadOptionsJSON(c.appRoot)
 	if err != nil {
 		return err
@@ -99,6 +104,19 @@ func (c Contributor) Contribute() error {
 	err = WriteOptionsToBuildpackYAML(c.appRoot, options)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (c Contributor) CheckForPythonExtentions() error {
+	extensionsExists, err := helper.FileExists(filepath.Join(c.appRoot, ".extensions"))
+	if err != nil {
+		return err
+	}
+
+	if extensionsExists {
+		return errors.New("Use of .extensions folder has been removed. Please remove this folder from your application.")
 	}
 
 	return nil

@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/buildpack/libbuildpack/buildplan"
-	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
-	"github.com/cloudfoundry/php-dist-cnb/php"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/buildpack/libbuildpack/buildplan"
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
+	"github.com/cloudfoundry/php-dist-cnb/php"
 
 	"github.com/cloudfoundry/libcfbuildpack/detect"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
@@ -29,44 +30,6 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		factory = test.NewDetectFactory(t)
 	})
 
-	when("a COMPOSER_PATH is set", func() {
-		it.Before(func() {
-			os.Setenv("COMPOSER_PATH", "some/composer/path")
-		})
-
-		it.After(func() {
-			os.Unsetenv("COMPOSER_PATH")
-		})
-
-		when(".extensions is present", func() {
-			it.Before(func() {
-				err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".extensions", "options.json"), 0x644, "{}")
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			it.After(func() {
-				err := os.RemoveAll(filepath.Join(factory.Detect.Application.Root, ".extensions"))
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			it("fails detect", func() {
-				code, err := runDetect(factory.Detect)
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(code).To(Equal(detect.FailStatusCode))
-			})
-		})
-
-		when(".extensions is not present", func() {
-			it("passes detect", func() {
-				code, err := runDetect(factory.Detect)
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(code).To(Equal(detect.PassStatusCode))
-			})
-		})
-	})
-
 	when(".bp-config exists", func() {
 		it.Before(func() {
 			err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".bp-config", "options.json"), 0644, "{}")
@@ -76,33 +39,6 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		it.After(func() {
 			err := os.RemoveAll(filepath.Join(factory.Detect.Application.Root, ".bp-config"))
 			Expect(err).ToNot(HaveOccurred())
-		})
-
-		when(".extensions is present", func() {
-			it.Before(func() {
-				err := helper.WriteFile(filepath.Join(factory.Detect.Application.Root, ".extensions", "options.json"), 0644, "{}")
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			it.After(func() {
-				err := os.RemoveAll(filepath.Join(factory.Detect.Application.Root, ".extensions"))
-				Expect(err).ToNot(HaveOccurred())
-			})
-			it("fails detect", func() {
-				code, err := runDetect(factory.Detect)
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(code).To(Equal(detect.FailStatusCode))
-			})
-		})
-
-		when(".extensions is not present", func() {
-			it("passes detect", func() {
-				code, err := runDetect(factory.Detect)
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(code).To(Equal(detect.PassStatusCode))
-			})
 		})
 
 		when("a PHP version is present", func() {
@@ -122,7 +58,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 						Requires: []buildplan.Required{
 							{Name: "php-compat"},
 							{Name: "php", Version: "7.2.*", Metadata: buildplan.Metadata{
-								"launch": true,
+								"launch":                    true,
 								buildpackplan.VersionSource: php.BuildpackYAMLSource,
 							}},
 						},
