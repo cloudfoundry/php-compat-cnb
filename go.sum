@@ -67,6 +67,8 @@ github.com/cloudfoundry/packit v0.0.0-20200129211718-a2b2b4f67a52 h1:wv8Z5HiXdpl
 github.com/cloudfoundry/packit v0.0.0-20200129211718-a2b2b4f67a52/go.mod h1:p3aFtVhY7pMoXsIrp8vTk01FYaFebTURk5KYae5/Nnw=
 github.com/cloudfoundry/php-composer-cnb v0.0.49 h1:CPsq89HjFEN8gQF+f9BrCZ37MM3+ajpnU7e6OS3G0kU=
 github.com/cloudfoundry/php-composer-cnb v0.0.49/go.mod h1:0m8XK310c+ii1U5sjZRtkNRAM3tufAKebTBXHpnRkCc=
+github.com/cloudfoundry/php-composer-cnb v0.0.63 h1:XDCW2kTjnEE8EhhoRpgkHyrHPqf7kNrOAeEwGyz5W78=
+github.com/cloudfoundry/php-composer-cnb v0.0.63/go.mod h1:0m8XK310c+ii1U5sjZRtkNRAM3tufAKebTBXHpnRkCc=
 github.com/cloudfoundry/php-dist-cnb v0.0.60 h1:RJEBuqr8QujO81VCyLwUoP+6NvlRKjAz39xL30ws3F8=
 github.com/cloudfoundry/php-dist-cnb v0.0.60/go.mod h1:TxLqK4rBAV096kog8+y2Wi0nrxbDdJyzE4oJpFaST8c=
 github.com/cloudfoundry/php-dist-cnb v0.0.99 h1:WtQLSxO9NBDFSW75vkAvbYoPanHWwi/fJ0AkogS/VEc=
