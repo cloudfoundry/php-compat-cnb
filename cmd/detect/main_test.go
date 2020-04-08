@@ -7,15 +7,13 @@ import (
 
 	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
-	"github.com/cloudfoundry/php-dist-cnb/php"
-
 	"github.com/cloudfoundry/libcfbuildpack/detect"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
-	. "github.com/onsi/gomega"
-
 	"github.com/cloudfoundry/libcfbuildpack/test"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
+
+	. "github.com/onsi/gomega"
 )
 
 func TestUnitDetect(t *testing.T) {
@@ -59,7 +57,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 							{Name: "php-compat"},
 							{Name: "php", Version: "7.2.*", Metadata: buildplan.Metadata{
 								"launch":                    true,
-								buildpackplan.VersionSource: php.BuildpackYAMLSource,
+								buildpackplan.VersionSource: "buildpack.yml",
 							}},
 						},
 					},

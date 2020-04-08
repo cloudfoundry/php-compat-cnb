@@ -22,8 +22,6 @@ github.com/buildpack/libbuildpack/stack
 # github.com/cloudfoundry/dagger v0.0.0-20200115142400-b69a9b4eabf4
 github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
-# github.com/cloudfoundry/httpd-cnb v0.0.83
-github.com/cloudfoundry/httpd-cnb/httpd
 # github.com/cloudfoundry/libcfbuildpack v1.91.23
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/buildpack
@@ -36,8 +34,6 @@ github.com/cloudfoundry/libcfbuildpack/logger
 github.com/cloudfoundry/libcfbuildpack/runner
 github.com/cloudfoundry/libcfbuildpack/services
 github.com/cloudfoundry/libcfbuildpack/test
-# github.com/cloudfoundry/nginx-cnb v0.0.92
-github.com/cloudfoundry/nginx-cnb/nginx
 # github.com/cloudfoundry/packit v0.0.0-20200129211718-a2b2b4f67a52
 github.com/cloudfoundry/packit/pexec
 # github.com/cloudfoundry/php-composer-cnb v0.0.49

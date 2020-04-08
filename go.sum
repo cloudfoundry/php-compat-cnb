@@ -46,8 +46,6 @@ github.com/cloudfoundry/dagger v0.0.0-20200114192520-43fb0b3ec98f/go.mod h1:PiNR
 github.com/cloudfoundry/dagger v0.0.0-20200115142400-b69a9b4eabf4 h1:bE5Oe75iiYgFOcrvH9FUGLK8KfYyrA+QGvl2RlFH0lA=
 github.com/cloudfoundry/dagger v0.0.0-20200115142400-b69a9b4eabf4/go.mod h1:PiNRNPj6nYimhASeft5kCrRhXzyKeqfkP9Wg+/7NivA=
 github.com/cloudfoundry/httpd-cnb v0.0.65-0.20191217205825-5463b3a78cdc/go.mod h1:m2cOFqn843z316TfzdNAVg3K9EP6jLY4vOPcmVUsrXQ=
-github.com/cloudfoundry/httpd-cnb v0.0.83 h1:TTD707j/z4VOchazQ+uoYLAoshYGyCgL3nwImSuRWAk=
-github.com/cloudfoundry/httpd-cnb v0.0.83/go.mod h1:fNfPEkM/rzybJfRE/GXyCJvLTaVe29oe0jaTY2/6YXo=
 github.com/cloudfoundry/libcfbuildpack v1.89.0 h1:A0OXihcHjvDRLYendhfqMxTBVe5pi5fmM5t4sqNRpao=
 github.com/cloudfoundry/libcfbuildpack v1.89.0/go.mod h1:ufhp/bp0LxbDDwbf2Ms3Bf4x9YnLr9dkL1RTUYSdKg0=
 github.com/cloudfoundry/libcfbuildpack v1.91.3 h1:SvknKBrrfX1sD6cz2RIm+zxKIbn0OaOdja1aECZITys=
@@ -56,13 +54,10 @@ github.com/cloudfoundry/libcfbuildpack v1.91.9/go.mod h1:cdFsbPedwjca4UIBjWwNV1V
 github.com/cloudfoundry/libcfbuildpack v1.91.22/go.mod h1:cEdi3DdqBruJMcaUw4MmP0iplOQeh7H4lcD3FtpqmOo=
 github.com/cloudfoundry/libcfbuildpack v1.91.23 h1:RCorc4zL0D4+mG2z/qOueFyYGz1j3rM+e3Vbb37KPLg=
 github.com/cloudfoundry/libcfbuildpack v1.91.23/go.mod h1:h95FwHvbelcd0cSOhLC8SGEZXLwCMYh1dZo2kCr7lsA=
-github.com/cloudfoundry/nginx-cnb v0.0.92 h1:NnkEh3lIAWCLD6lK4LQKQ58rKShZiVw7EHl7hL4AHu8=
-github.com/cloudfoundry/nginx-cnb v0.0.92/go.mod h1:PlO2wupCm+e5NbCGmsBc3J5L6cUSvVxrc7PN+dcpSIw=
 github.com/cloudfoundry/packit v0.0.0-20191202164725-43d6fa19d96c h1:sjyfrHBlVjWqMfBIZclmrdI430kcKOjT6+dVgix476c=
 github.com/cloudfoundry/packit v0.0.0-20191202164725-43d6fa19d96c/go.mod h1:FffmDGXYVSrrj9HlFP4XbnJnQi7jHcsElHujPGbfP3U=
 github.com/cloudfoundry/packit v0.0.0-20191213210055-5b63a8a0a976 h1:E4rxxvrT1H3WN63kmOLZ2L4iW2VMm4SHVBRIvW10auA=
 github.com/cloudfoundry/packit v0.0.0-20191213210055-5b63a8a0a976/go.mod h1:FBe0GK9B8hkfQeyD5UzrGz0j115H+OH7L3Yc/EuDunI=
-github.com/cloudfoundry/packit v0.0.0-20191220164501-d7f225fefe2c/go.mod h1:FBe0GK9B8hkfQeyD5UzrGz0j115H+OH7L3Yc/EuDunI=
 github.com/cloudfoundry/packit v0.0.0-20200129211718-a2b2b4f67a52 h1:wv8Z5HiXdplVvSv+OWlhtalg1jGJmsC7P7AT5eZVSic=
 github.com/cloudfoundry/packit v0.0.0-20200129211718-a2b2b4f67a52/go.mod h1:p3aFtVhY7pMoXsIrp8vTk01FYaFebTURk5KYae5/Nnw=
 github.com/cloudfoundry/php-composer-cnb v0.0.49 h1:CPsq89HjFEN8gQF+f9BrCZ37MM3+ajpnU7e6OS3G0kU=

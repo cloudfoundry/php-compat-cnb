@@ -2,21 +2,14 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
-	"github.com/cloudfoundry/php-dist-cnb/php"
-
 	"github.com/buildpack/libbuildpack/buildplan"
-	"github.com/cloudfoundry/httpd-cnb/httpd"
-	"github.com/cloudfoundry/nginx-cnb/nginx"
-
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
+	"github.com/cloudfoundry/libcfbuildpack/detect"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/php-compat-cnb/compat"
-
-	"os"
-
-	"github.com/cloudfoundry/libcfbuildpack/detect"
 )
 
 func main() {
@@ -73,15 +66,15 @@ func runDetect(context detect.Detect) (int, error) {
 	}
 
 	if webDirExists {
-		webServer := httpd.Dependency
+		webServer := "httpd"
 		if options.PHP.WebServer != "" {
 			webServer = options.PHP.WebServer
 		}
 
 		webServerVersion := "*"
-		if webServer == httpd.Dependency {
+		if webServer == "httpd" {
 			webServerVersion = options.HTTPD.Version
-		} else if webServer == nginx.Dependency {
+		} else if webServer == "nginx" {
 			webServerVersion = options.Nginx.Version
 		}
 
@@ -96,11 +89,11 @@ func runDetect(context detect.Detect) (int, error) {
 
 	if options.PHP.Version != "" {
 		plan.Requires = append(plan.Requires, buildplan.Required{
-			Name:    php.Dependency,
+			Name:    "php",
 			Version: options.PHP.Version,
 			Metadata: buildplan.Metadata{
 				"launch":                    true,
-				buildpackplan.VersionSource: php.BuildpackYAMLSource,
+				buildpackplan.VersionSource: "buildpack.yml",
 			},
 		})
 	}
