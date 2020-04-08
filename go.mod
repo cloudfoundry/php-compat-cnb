@@ -7,7 +7,7 @@ require (
 	github.com/cloudfoundry/dagger v0.0.0-20200115142400-b69a9b4eabf4
 	github.com/cloudfoundry/httpd-cnb v0.0.83
 	github.com/cloudfoundry/libcfbuildpack v1.91.23
-	github.com/cloudfoundry/nginx-cnb v0.0.92
+	github.com/cloudfoundry/nginx-cnb v0.0.110
 	github.com/cloudfoundry/php-composer-cnb v0.0.49
 	github.com/cloudfoundry/php-dist-cnb v0.0.99
 	github.com/google/go-cmp v0.4.0
