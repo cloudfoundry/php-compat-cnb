@@ -10,8 +10,8 @@ import (
 
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/libcfbuildpack/logger"
-	"github.com/cloudfoundry/php-composer-cnb/runner"
-	"github.com/cloudfoundry/php-web-cnb/config"
+	"github.com/paketo-buildpacks/php-composer/runner"
+	"github.com/paketo-buildpacks/php-web/config"
 	"gopkg.in/yaml.v2"
 )
 
