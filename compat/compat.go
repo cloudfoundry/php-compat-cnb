@@ -14,7 +14,7 @@ import (
 	"github.com/cloudfoundry/libcfbuildpack/build"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/libcfbuildpack/logger"
-	"github.com/cloudfoundry/php-composer-cnb/composer"
+	"github.com/paketo-buildpacks/php-composer/composer"
 	"gopkg.in/yaml.v2"
 )
 
