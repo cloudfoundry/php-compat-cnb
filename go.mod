@@ -8,7 +8,7 @@ require (
 	github.com/cloudfoundry/libcfbuildpack v1.91.23
 	github.com/google/go-cmp v0.4.0
 	github.com/onsi/gomega v1.10.0
-	github.com/paketo-buildpacks/php-composer v0.0.79
+	github.com/paketo-buildpacks/php-composer v0.0.81
 	github.com/sclevine/spec v1.4.0
 	gopkg.in/yaml.v2 v2.3.0
 )
