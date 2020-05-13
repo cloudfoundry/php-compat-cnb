@@ -67,7 +67,7 @@ github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
-# github.com/paketo-buildpacks/php-composer v0.0.79
+# github.com/paketo-buildpacks/php-composer v0.0.81
 github.com/paketo-buildpacks/php-composer/composer
 github.com/paketo-buildpacks/php-composer/runner
 # github.com/paketo-buildpacks/php-web v0.0.101
