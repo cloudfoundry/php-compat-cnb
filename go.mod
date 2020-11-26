@@ -10,5 +10,5 @@ require (
 	github.com/onsi/gomega v1.10.0
 	github.com/paketo-buildpacks/php-composer v0.0.83
 	github.com/sclevine/spec v1.4.0
-	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/yaml.v2 v2.4.0
 )
